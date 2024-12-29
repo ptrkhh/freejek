@@ -17,3 +17,7 @@ A simple Streamlit app template for you to modify!
    ```
    $ streamlit run streamlit_app.py
    ```
+   
+
+`sb-pydantic gen --type pydantic --framework fastapi --db-url 'postgresql://postgres.wgqajkdroolpmqtdlvlg:[PROJECT_PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres'`
+
