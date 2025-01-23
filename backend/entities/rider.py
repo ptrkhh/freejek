@@ -1,32 +1,27 @@
 import datetime
+from typing import Optional
+from uuid import UUID
 
-from pydantic import UUID4, BaseModel, Field
-
-from backend.entities.trip import Trip
+from sqlmodel import Field, SQLModel
 
 
-class RiderBaseSchema(BaseModel):
-    """Rider Base Schema."""
+class Rider(SQLModel, table=True):
+    __tablename__ = "rider"
+    # __table_args__ = {'extend_existing': True}
 
-    # Primary Keys
-    id: UUID4
+    id: Optional[UUID] = Field(default=None, primary_key=True)
 
-    # Columns
-    auth_id: UUID4 | None = Field(default=None)
-    created_at: datetime.datetime
     deleted_at: datetime.datetime | None = Field(default=None)
+    updated_at: datetime.datetime | None = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
+        sa_column_kwargs={"onupdate": lambda: datetime.datetime.now(datetime.timezone.utc)},
+    )
+    created_at: Optional[datetime.datetime]
+
+    auth_id: UUID | None = Field(default=None)
+
     email: str | None = Field(default=None)
     name: str | None = Field(default=None)
     phone: str | None = Field(default=None)
     photo: str | None = Field(default=None)
-    updated_at: datetime.datetime
-
-
-class Rider(RiderBaseSchema):
-    """Rider Schema for Pydantic.
-
-    Inherits from RiderBaseSchema. Add any customization here.
-    """
-
-    # Foreign Keys
-    trip: list[Trip] | None = Field(default=None)

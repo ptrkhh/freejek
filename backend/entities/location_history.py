@@ -1,28 +1,17 @@
 import datetime
+from typing import Optional
+from uuid import UUID
 
-from pydantic import UUID4, BaseModel, Field
-
-from backend.entities.trip import Trip
+from sqlmodel import Field, SQLModel
 
 
-class LocationHistoryBaseSchema(BaseModel):
-    """LocationHistory Base Schema."""
+class LocationHistory(SQLModel, table=True):
+    __tablename__ = "location_history"
+    # __table_args__ = {'extend_existing': True}
 
-    # Primary Keys
-    id: UUID4
+    id: Optional[UUID] = Field(default=None, primary_key=True)
+    created_at: Optional[datetime.datetime]
+    trip_id: UUID | None = Field(default=None, foreign_key="trip.id")
 
-    # Columns
-    created_at: datetime.datetime
     lat: float
     on: float
-    trip_id: UUID4
-
-
-class LocationHistory(LocationHistoryBaseSchema):
-    """LocationHistory Schema for Pydantic.
-
-    Inherits from LocationHistoryBaseSchema. Add any customization here.
-    """
-
-    # Foreign Keys
-    trip: list[Trip] | None = Field(default=None)

@@ -1,28 +1,22 @@
 import datetime
+from typing import Optional
+from uuid import UUID
 
-from pydantic import UUID4, BaseModel, Field
-
-from backend.entities.dispute import Dispute
-from backend.entities.driver import Driver
-from backend.entities.location_history import LocationHistory
-from backend.entities.rider import Rider
-from backend.entities.vehicle_unit import VehicleUnit
+from sqlmodel import Field, SQLModel
 
 
-class TripBaseSchema(BaseModel):
-    """Trip Base Schema."""
+class Trip(SQLModel, table=True):
+    __tablename__ = "trip"
+    # __table_args__ = {'extend_existing': True}
 
-    # Primary Keys
-    id: UUID4
+    id: Optional[UUID] = Field(default=None, primary_key=True)
 
-    # Columns
     accepted_at: datetime.datetime | None = Field(default=None)
     canceled_at: datetime.datetime | None = Field(default=None)
     comment_to_driver: str | None = Field(default=None)
     comment_to_rider: str | None = Field(default=None)
     completed_at: datetime.datetime | None = Field(default=None)
     created_at: datetime.datetime
-    driver_id: UUID4
     dropoff_lat: float
     dropoff_lon: float
     fare: int
@@ -32,23 +26,15 @@ class TripBaseSchema(BaseModel):
     rate_to_driver: int | None = Field(default=None)
     rate_to_rider: int | None = Field(default=None)
     request: str | None = Field(default=None)
-    rider_id: UUID4
     started_at: datetime.datetime | None = Field(default=None)
-    updated_at: datetime.datetime | None = Field(default=None)
+    updated_at: datetime.datetime | None = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc),
+        nullable=False,
+        sa_column_kwargs={"onupdate": lambda: datetime.datetime.now(datetime.timezone.utc)},
+    )
     vehicle_color: str
-    vehicle_id: UUID4
     vehicle_plate: str
 
-
-class Trip(TripBaseSchema):
-    """Trip Schema for Pydantic.
-
-    Inherits from TripBaseSchema. Add any customization here.
-    """
-
-    # Foreign Keys
-    driver: list[Driver] | None = Field(default=None)
-    rider: list[Rider] | None = Field(default=None)
-    vehicle_unit: list[VehicleUnit] | None = Field(default=None)
-    dispute: list[Dispute] | None = Field(default=None)
-    location_history: list[LocationHistory] | None = Field(default=None)
+    driver_id: UUID | None = Field(default=None, foreign_key="driver.id")
+    rider_id: UUID = Field(foreign_key="rider.id")
+    vehicle_id: UUID | None = Field(default=None, foreign_key="vehicle_unit.id")

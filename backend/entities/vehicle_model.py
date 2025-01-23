@@ -1,31 +1,33 @@
 import datetime
+from enum import Enum
+from typing import Optional
+from uuid import UUID
 
-from pydantic import UUID4, BaseModel, Field
-
-from backend.entities.vehicle_unit import VehicleUnit
+from sqlmodel import SQLModel, Field
 
 
-class VehicleModelBaseSchema(BaseModel):
-    """VehicleModel Base Schema."""
+class VehicleModel(SQLModel, table=True):
+    __tablename__ = "vehicle_model"
+    # __table_args__ = {'extend_existing': True}
 
-    # Primary Keys
-    id: UUID4
-
-    # Columns
+    id: Optional[UUID] = Field(default=None, primary_key=True)
+    print("ID GENERATED")
     capacity: int
-    created_at: datetime.datetime
-    field_class: int = Field(alias="class")
-    field_type: str = Field(alias="type")
+    created_at: Optional[datetime.datetime]
+    vehicle_class: int
     make: str
     model: str
-    propulsion: str
 
+    class VehicleType(Enum):
+        CAR = "CAR"
+        MOTORCYCLE = "MOTORCYCLE"
 
-class VehicleModel(VehicleModelBaseSchema):
-    """VehicleModel Schema for Pydantic.
+    type: VehicleType
 
-    Inherits from VehicleModelBaseSchema. Add any customization here.
-    """
+    class VehiclePropulsion(Enum):
+        PETROL = "PETROL"
+        HYBRID = "HYBRID"
+        ELECTRIC = "ELECTRIC"
+        DIESEL = "DIESEL"
 
-    # Foreign Keys
-    vehicle_unit: list[VehicleUnit] | None = Field(default=None)
+    propulsion: VehiclePropulsion
