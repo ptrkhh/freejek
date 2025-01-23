@@ -24,7 +24,7 @@ class ServiceRiderAuth:
 
         # TODO check if supabase auth already exists
         if True:
-            data: AuthResponse = self.repository.supabase.auth.sign_up({
+            data: AuthResponse = self.repository.supabase_client.auth.sign_up({
                 'email': email,
                 'password': password,
                 'options': {
