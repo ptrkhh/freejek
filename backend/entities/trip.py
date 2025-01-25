@@ -1,8 +1,11 @@
 import datetime
-from typing import Optional
+from typing import Optional, Literal
 from uuid import UUID
 
+from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
+
+from backend.entities.latlon import LatLon
 
 
 class Trip(SQLModel, table=True):
@@ -38,3 +41,13 @@ class Trip(SQLModel, table=True):
     driver_id: UUID | None = Field(default=None, foreign_key="driver.id")
     rider_id: UUID = Field(foreign_key="rider.id")
     vehicle_id: UUID | None = Field(default=None, foreign_key="vehicle_unit.id")
+
+class TripCreationRequest(BaseModel):
+    rider_id: UUID
+    orig: LatLon
+    dest: LatLon
+    vehicle_class: int
+    vehicle_type: Literal["car", "motorcycle"]
+    request: str
+    passenger: int
+    fare: int
