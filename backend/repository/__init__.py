@@ -1,6 +1,7 @@
 from sqlmodel import engine
 from supabase import Client
 
+from backend.repository.osm import RepositoryOsm
 from backend.repository.rider import RepositoryRider
 from backend.repository.rider import RepositoryRider
 from backend.repository.vehicle_model import RepositoryVehicleModel
@@ -12,3 +13,4 @@ class Repository:
         self.supabase = supabase
         self.vehicle_model = RepositoryVehicleModel(engine=postgres)
         self.rider = RepositoryRider(engine=postgres)
+        self.osm = RepositoryOsm()
