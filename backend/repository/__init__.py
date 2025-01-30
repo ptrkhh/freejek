@@ -1,6 +1,7 @@
 from sqlmodel import engine
 from supabase import Client
 
+from backend.repository.location_history import RepositoryLocationHistory
 from backend.repository.osm import RepositoryOsm
 from backend.repository.rider import RepositoryRider
 from backend.repository.rider import RepositoryRider
@@ -15,4 +16,5 @@ class Repository:
         self.vehicle_model = RepositoryVehicleModel(engine=postgres)
         self.rider = RepositoryRider(engine=postgres)
         self.trip = RepositoryTrip(engine=postgres)
+        self.location_history = RepositoryLocationHistory(engine=postgres)
         self.osm = RepositoryOsm()

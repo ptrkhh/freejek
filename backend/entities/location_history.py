@@ -12,6 +12,8 @@ class LocationHistory(SQLModel, table=True):
     id: Optional[UUID] = Field(default=None, primary_key=True)
     created_at: Optional[datetime.datetime]
     trip_id: UUID | None = Field(default=None, foreign_key="trip.id")
+    driver_id: UUID | None = Field(default=None, foreign_key="driver.id") # TODO add to supabase
+    rider_id: UUID | None = Field(default=None, foreign_key="rider.id") # TODO add to supabase
 
     lat: float
-    on: float
+    lon: float

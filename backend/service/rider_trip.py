@@ -10,7 +10,7 @@ from backend.entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
 from backend.repository import Repository
 
 
-class ServiceRiderRide:
+class ServiceRiderTrip:
     def __init__(self, repository: Repository):
         self.repository = repository
         self.base_price: int = 5000  # TODO env
