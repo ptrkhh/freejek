@@ -19,10 +19,10 @@ class RepositoryVehicleModel:
             sess.close()
         return results
 
-    def get_by_id(self, id: UUID, session: Session = None) -> List[VehicleModel]:
+    def get_by_id(self, id: UUID, session: Session = None) -> VehicleModel:
         sess = session if session else Session(self.engine)
         statement = select(VehicleModel).where(VehicleModel.id == id)
-        results: List[VehicleModel] = sess.execute(statement).scalars().all()
+        results: VehicleModel = sess.execute(statement).scalars().one()
         if session is None:
             sess.close()
         return results

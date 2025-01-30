@@ -1,11 +1,8 @@
 import datetime
-from typing import Optional, Literal
+from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
-
-from backend.entities.latlon import LatLon
 
 
 class Trip(SQLModel, table=True):
@@ -42,12 +39,19 @@ class Trip(SQLModel, table=True):
     rider_id: UUID = Field(foreign_key="rider.id")
     vehicle_id: UUID | None = Field(default=None, foreign_key="vehicle_unit.id")
 
-class TripCreationRequest(BaseModel):
-    rider_id: UUID
-    orig: LatLon
-    dest: LatLon
-    vehicle_class: int
-    vehicle_type: Literal["car", "motorcycle"]
-    request: str
-    passenger: int
-    fare: int
+
+def trip_status(trip: Trip) -> str:  # TODO ENUM
+    if trip.canceled_at:
+        return "CANCELED"
+    if trip.completed_at:
+        return "COMPLETED"
+    if trip.started_at:
+        return "STARTED"
+    if trip.accepted_at:
+        return "ACCEPTED"
+    return "PENDING"
+
+
+def is_trip_active(trip: Trip) -> bool:
+    status = trip_status(trip)
+    return status == "ACCEPTED" or status == "PENDING" or status == "STARTED"

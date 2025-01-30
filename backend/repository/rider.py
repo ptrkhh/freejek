@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlmodel import Session
 from sqlmodel import select, engine
 
@@ -8,9 +10,17 @@ class RepositoryRider:
     def __init__(self, engine: engine):
         self.engine = engine
 
-    def get_by_id(self, email: str, session: Session = None) -> Rider:
+    def get_by_email(self, email: str, session: Session = None) -> Rider:
         sess = session if session else Session(self.engine)
         statement = select(Rider).where(Rider.email == email)
+        results: Rider = sess.execute(statement).scalars().one()
+        if session is None:
+            sess.close()
+        return results
+
+    def get_by_auth_id(self, auth_id: UUID, session: Session = None) -> Rider:
+        sess = session if session else Session(self.engine)
+        statement = select(Rider).where(Rider.auth_id == auth_id)
         results: Rider = sess.execute(statement).scalars().one()
         if session is None:
             sess.close()
