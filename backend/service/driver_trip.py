@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import List
 from uuid import UUID
@@ -5,7 +6,7 @@ from uuid import UUID
 from sqlmodel import Session
 
 from backend.entities.latlon import LatLon
-from backend.entities.trip import Trip, TripStatus, trip_status
+from backend.entities.trip import TripStatus, trip_status
 from backend.entities.web_trip import GetTripsResp
 from backend.repository import Repository
 from backend.service.util import minmaxlatlon
@@ -48,13 +49,13 @@ class ServiceDriverTrip:
             vehicle_id=i.vehicle_id,
         ) for i in trips]
 
-    def accept_trip(self, driver_id: UUID, vehicle_id: UUID, trip_id: UUID, session: Session = None):
+    def accept_trip(self, trip_id: UUID, driver_id: UUID, vehicle_id: UUID, session: Session = None) -> None:
         trip = self.repository.trip.get_by_id(trip_id, session=session)
         status = trip_status(trip)
         if status != TripStatus.AVAILABLE:
-            raise AssertionError(f"TRIP {trip_id} {status} IS NOT AVAILABLE")
+            raise AssertionError(f"TRIP {trip_id} STATUS {status} IS NOT AVAILABLE")
         other_trips = self.repository.trip.get_by_driver_id(driver_id, TripStatus.ONGOING, session=session)
-        if len(other_trips) != 0:
+        if len(other_trips) > 0:
             raise AssertionError(f"DRIVER {driver_id} IN ANOTHER TRIP")
         vehicle = self.repository.vehicle_unit.get_by_id(vehicle_id, session=session)
 
@@ -63,10 +64,34 @@ class ServiceDriverTrip:
         trip.vehicle_id = vehicle_id
         trip.vehicle_color = vehicle.color
         trip.vehicle_plate = vehicle.plate
-
         self.repository.trip.update(trip, session=session)
 
-    def complete_trip(self, driver_id: UUID, trip_id: UUID, session: Session = None) -> Trip:
-        # TODO check trip is eligible to complete
-        # TODO complete
-        raise NotImplementedError
+    def complete_trip(self, trip_id: UUID, driver_id: UUID, session: Session = None) -> None:
+        trip = self.repository.trip.get_by_id(trip_id, session=session)
+        if trip.driver_id != driver_id:
+            raise AssertionError(f"TRIP {trip_id} IS NOT DRIVER {driver_id}")
+        status = trip_status(trip)
+        if status != TripStatus.ONGOING:
+            raise AssertionError(f"TRIP {trip_id} STATUS {status} IS NOT ONGOING")
+
+        trip.completed_at = datetime.now()
+        self.repository.trip.update(trip, session=session)
+
+    def add_comment(self, trip_id: UUID, driver_id: UUID, rate: int = 0, comment: str = None, session: Session = None):
+        trip = self.repository.trip.get_by_id(trip_id, session=session)
+        if trip.driver_id != driver_id:
+            raise AssertionError(f"TRIP {trip_id} IS NOT DRIVER {driver_id}")
+        status = trip_status(trip)
+        if status != TripStatus.COMPLETED:
+            raise AssertionError(f"TRIP {trip_id} STATUS {status} IS NOT COMPLETED")
+
+        if rate:
+            trip.rate_from_driver = rate
+        else:
+            logging.warn(f"TRIP {trip_id} RATING FROM DRIVER IS NONE")
+        if comment:
+            trip.comment_to_driver = comment
+        else:
+            logging.warn(f"TRIP {trip_id} COMMENT FROM DRIVER IS NONE")
+
+        self.repository.trip.update(trip, session=session)

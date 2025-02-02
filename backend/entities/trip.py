@@ -14,8 +14,8 @@ class Trip(SQLModel, table=True):
 
     accepted_at: datetime.datetime | None = Field(default=None)
     canceled_at: datetime.datetime | None = Field(default=None)
-    comment_to_driver: str | None = Field(default=None)
-    comment_to_rider: str | None = Field(default=None)
+    comment_from_driver: str | None = Field(default=None)  # TODO rename in Supabase
+    comment_from_rider: str | None = Field(default=None)  # TODO rename in Supabase
     completed_at: datetime.datetime | None = Field(default=None)
     created_at: datetime.datetime
     dropoff_lat: float
@@ -24,8 +24,8 @@ class Trip(SQLModel, table=True):
     passenger: int
     pickup_lat: float
     pickup_lon: float
-    rate_to_driver: int | None = Field(default=None)
-    rate_to_rider: int | None = Field(default=None)
+    rate_from_driver: int | None = Field(default=None)  # TODO rename in Supabase
+    rate_from_rider: int | None = Field(default=None)  # TODO rename in Supabase
     request: str | None = Field(default=None)
     started_at: datetime.datetime | None = Field(default=None)
     updated_at: datetime.datetime | None = Field(

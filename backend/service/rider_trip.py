@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Literal, List
 from uuid import UUID
@@ -5,7 +6,7 @@ from uuid import UUID
 from sqlmodel import Session
 
 from backend.entities.latlon import LatLon
-from backend.entities.trip import Trip, is_trip_active
+from backend.entities.trip import Trip, is_trip_active, trip_status, TripStatus
 from backend.entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
 from backend.repository import Repository
 
@@ -130,3 +131,22 @@ class ServiceRiderTrip:
             rider_id=i.rider_id,
             vehicle_id=i.vehicle_id,
         )
+
+    def add_comment(self, trip_id: UUID, rider_id: UUID, rate: int = 0, comment: str = None, session: Session = None):
+        trip = self.repository.trip.get_by_id(trip_id, session=session)
+        if trip.rider_id != rider_id:
+            raise AssertionError(f"TRIP {trip_id} IS NOT RIDER {rider_id}")
+        status = trip_status(trip)
+        if status != TripStatus.COMPLETED:
+            raise AssertionError(f"TRIP {trip_id} STATUS {status} IS NOT COMPLETED")
+
+        if rate:
+            trip.rate_from_rider = rate
+        else:
+            logging.warn(f"TRIP {trip_id} RATING FROM RIDER IS NONE")
+        if comment:
+            trip.comment_from_rider = comment
+        else:
+            logging.warn(f"TRIP {trip_id} COMMENT FROM RIDER IS NONE")
+
+        self.repository.trip.update(trip, session=session)
