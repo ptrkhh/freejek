@@ -7,6 +7,7 @@ from backend.repository.rider import RepositoryRider
 from backend.repository.rider import RepositoryRider
 from backend.repository.trip import RepositoryTrip
 from backend.repository.vehicle_model import RepositoryVehicleModel
+from backend.repository.vehicle_unit import RepositoryVehicleUnit
 
 
 class Repository:
@@ -14,6 +15,7 @@ class Repository:
         self.postgres = postgres
         self.supabase = supabase
         self.vehicle_model = RepositoryVehicleModel(engine=postgres)
+        self.vehicle_unit = RepositoryVehicleUnit(engine=postgres)
         self.rider = RepositoryRider(engine=postgres)
         self.trip = RepositoryTrip(engine=postgres)
         self.location_history = RepositoryLocationHistory(engine=postgres)
