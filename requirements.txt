@@ -1,2 +1,5 @@
 streamlit
 supabase
+sqlmodel
+PyJWT
+streamlit-local-storage

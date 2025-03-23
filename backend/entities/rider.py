@@ -7,7 +7,7 @@ from sqlmodel import Field, SQLModel
 
 class Rider(SQLModel, table=True):
     __tablename__ = "rider"
-    # __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
 
     id: Optional[UUID] = Field(default=None, primary_key=True)
 

@@ -24,7 +24,7 @@ class DisputeBaseSchema(BaseModel):
 
 class Dispute(SQLModel, table=True):
     __tablename__ = "dispute"
-    # __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
 
     id: Optional[UUID] = Field(default=None, primary_key=True)
     trip_id: UUID = Field(foreign_key="trip.id")

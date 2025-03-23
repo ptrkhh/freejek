@@ -1,10 +1,7 @@
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from .routes import employees_routes
+import streamlit as st
 
-app = FastAPI()
+from backend.controller.router import Controller
 
-app.mount("/static", StaticFiles(directory="./employee_repo/static"), name="static")
-templates = Jinja2Templates(directory="./employee_repo/templates")
+c = Controller()
 
-app.include_router(employee_routes.router)
+st.title("FREEJEK ALWAYS FREE")

@@ -1,21 +1,20 @@
 import datetime
-import enum
+from enum import Enum
+from sqlmodel import Field, SQLModel
 from typing import Optional
 from uuid import UUID
-
-from sqlmodel import Field, SQLModel
 
 
 class Trip(SQLModel, table=True):
     __tablename__ = "trip"
-    # __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
 
     id: Optional[UUID] = Field(default=None, primary_key=True)
 
     accepted_at: datetime.datetime | None = Field(default=None)
     canceled_at: datetime.datetime | None = Field(default=None)
-    comment_from_driver: str | None = Field(default=None)  # TODO rename in Supabase
-    comment_from_rider: str | None = Field(default=None)  # TODO rename in Supabase
+    comment_from_driver: str | None = Field(default=None)
+    comment_from_rider: str | None = Field(default=None)
     completed_at: datetime.datetime | None = Field(default=None)
     created_at: datetime.datetime
     dropoff_lat: float
@@ -24,8 +23,8 @@ class Trip(SQLModel, table=True):
     passenger: int
     pickup_lat: float
     pickup_lon: float
-    rate_from_driver: int | None = Field(default=None)  # TODO rename in Supabase
-    rate_from_rider: int | None = Field(default=None)  # TODO rename in Supabase
+    rate_from_driver: int | None = Field(default=None)
+    rate_from_rider: int | None = Field(default=None)
     request: str | None = Field(default=None)
     started_at: datetime.datetime | None = Field(default=None)
     updated_at: datetime.datetime | None = Field(
@@ -41,7 +40,7 @@ class Trip(SQLModel, table=True):
     vehicle_id: UUID | None = Field(default=None, foreign_key="vehicle_unit.id")
 
 
-class TripStatus(enum):
+class TripStatus(Enum):
     CANCELED = "CANCELED"
     COMPLETED = "COMPLETED"
     ONGOING = "ONGOING"
@@ -51,14 +50,14 @@ class TripStatus(enum):
 
 def trip_status(trip: Trip) -> str:
     if trip.canceled_at:
-        return TripStatus.CANCELED
+        return TripStatus.CANCELED.value
     if trip.completed_at:
-        return TripStatus.COMPLETED
+        return TripStatus.COMPLETED.value
     if trip.started_at:
-        return TripStatus.ONGOING
+        return TripStatus.ONGOING.value
     if trip.accepted_at:
-        return TripStatus.ACCEPTED
-    return TripStatus.AVAILABLE
+        return TripStatus.ACCEPTED.value
+    return TripStatus.AVAILABLE.value
 
 
 def is_trip_active(trip: Trip) -> bool:

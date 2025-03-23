@@ -7,7 +7,7 @@ from sqlmodel import Field, SQLModel
 
 class Driver(SQLModel, table=True):
     __tablename__ = "driver"
-    # __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
 
     id: Optional[UUID] = Field(default=None, primary_key=True)
     deleted_at: datetime.datetime | None = Field(default=None)

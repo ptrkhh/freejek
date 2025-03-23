@@ -7,7 +7,7 @@ from sqlmodel import Field, SQLModel
 
 class VehicleUnit(SQLModel, table=True):
     __tablename__ = "vehicle_unit"
-    # __table_args__ = {'extend_existing': True}
+    __table_args__ = {'extend_existing': True}
 
     id: Optional[UUID] = Field(default=None, primary_key=True)
     vehicle_year: int
