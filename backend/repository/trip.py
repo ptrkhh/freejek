@@ -1,7 +1,7 @@
 from typing import List, Union
 from uuid import UUID
 
-from sqlalchemy.engine import Engine
+from sqlalchemy import Engine
 from sqlmodel import Session, select, and_
 from sqlmodel.sql.expression import SelectOfScalar
 
@@ -25,7 +25,7 @@ class RepositoryTrip:
             Trip.pickup_lon <= maxlatlon.lon,
         ))  # TODO page and limit
         statement = self._filter_by_status(TripStatus.AVAILABLE, statement)
-        results: List[Trip] = sess.execute(statement).scalars().all()
+        results: List[Trip] = sess.exec(statement).all()
         if session is None:
             sess.close()
         return results
@@ -33,7 +33,7 @@ class RepositoryTrip:
     def get_by_id(self, id: UUID, session: Session = None) -> Trip:
         sess = session if session else Session(self.engine)
         statement = select(Trip).where(Trip.id == id)
-        results: Trip = sess.execute(statement).scalars().one()
+        results: Trip = sess.exec(statement).one()
         if session is None:
             sess.close()
         return results
@@ -46,7 +46,7 @@ class RepositoryTrip:
         sess = session if session else Session(self.engine)
         statement = select(Trip).where(Trip.driver_id == driver_id)
         statement = self._filter_by_status(status, statement)
-        results: List[Trip] = sess.execute(statement).scalars().all()
+        results: List[Trip] = sess.exec(statement).all()
         if session is None:
             sess.close()
         return results
@@ -54,7 +54,7 @@ class RepositoryTrip:
     def get_by_rider_id(self, rider_id: UUID, session: Session = None) -> List[Trip]:
         sess = session if session else Session(self.engine)
         statement = select(Trip).where(Trip.rider_id == rider_id)
-        results: List[Trip] = sess.execute(statement).scalars().all()
+        results: List[Trip] = sess.exec(statement).all()
         if session is None:
             sess.close()
         return results

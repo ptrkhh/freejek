@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 
-from sqlalchemy.engine import Engine
+from sqlalchemy import Engine
 from sqlmodel import Session
 from sqlmodel import select
 
@@ -15,7 +15,7 @@ class RepositoryVehicleUnit:
     def get_all(self, session: Session = None) -> List[VehicleUnit]:
         sess = session if session else Session(self.engine)
         statement = select(VehicleUnit)
-        results: List[VehicleUnit] = sess.execute(statement).scalars().all()
+        results: List[VehicleUnit] = sess.exec(statement).all()
         if session is None:
             sess.close()
         return results
@@ -23,7 +23,7 @@ class RepositoryVehicleUnit:
     def get_by_id(self, id: UUID, session: Session = None) -> VehicleUnit:
         sess = session if session else Session(self.engine)
         statement = select(VehicleUnit).where(VehicleUnit.id == id)
-        results: VehicleUnit = sess.execute(statement).scalars().one()
+        results: VehicleUnit = sess.exec(statement).one()
         if session is None:
             sess.close()
         return results

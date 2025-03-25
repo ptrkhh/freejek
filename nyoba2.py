@@ -1,61 +1,17 @@
-THE
-RES
-user = User(id='6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6', app_metadata={'provider': 'email', 'providers': ['email']},
-            user_metadata={'email': 'ptrkhh@outlook.com', 'email_verified': False, 'phone_verified': False,
-                           'sub': '6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6'}, aud='authenticated',
-            confirmation_sent_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 362936, tzinfo=TzInfo(UTC)),
-            recovery_sent_at=datetime.datetime(2024, 12, 24, 13, 8, 41, 555390, tzinfo=TzInfo(UTC)),
-            email_change_sent_at=None, new_email=None, new_phone=None, invited_at=None, action_link=None,
-            email='ptrkhh@outlook.com', phone='',
-            created_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 353621, tzinfo=TzInfo(UTC)),
-            confirmed_at=datetime.datetime(2024, 12, 24, 12, 40, 15, 93668, tzinfo=TzInfo(UTC)),
-            email_confirmed_at=datetime.datetime(2024, 12, 24, 12, 40, 15, 93668, tzinfo=TzInfo(UTC)),
-            phone_confirmed_at=None,
-            last_sign_in_at=datetime.datetime(2024, 12, 24, 13, 8, 56, 951181, tzinfo=TzInfo(UTC)),
-            role='authenticated', updated_at=datetime.datetime(2024, 12, 24, 13, 8, 56, 954467, tzinfo=TzInfo(UTC)),
-            identities=[UserIdentity(id='6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6',
-                                     identity_id='436594b2-caa0-4dbc-a7bf-659d2552d736',
-                                     user_id='6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6',
-                                     identity_data={'email': 'ptrkhh@outlook.com', 'email_verified': False,
-                                                    'phone_verified': False,
-                                                    'sub': '6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6'}, provider='email',
-                                     created_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 359931, tzinfo=TzInfo(UTC)),
-                                     last_sign_in_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 359880,
-                                                                       tzinfo=TzInfo(UTC)),
-                                     updated_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 359931,
-                                                                  tzinfo=TzInfo(UTC)))], is_anonymous=False,
-            factors=None)
-session = Session(provider_token=None, provider_refresh_token=None,
-                  access_token='eyJhbGciOiJIUzI1NiIsImtpZCI6IkJ2bk9oZ1hMaS9Sd2R4b3QiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3dncWFqa2Ryb29scG1xdGRsdmxnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2ZDYyZDk1Mi1kOGM4LTRlYTktYWQ0NS1jMTdmYzhkZjJhYzYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzM1MDQ5MzM2LCJpYXQiOjE3MzUwNDU3MzYsImVtYWlsIjoicHRya2hoQG91dGxvb2suY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InB0cmtoaEBvdXRsb29rLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiI2ZDYyZDk1Mi1kOGM4LTRlYTktYWQ0NS1jMTdmYzhkZjJhYzYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvdHAiLCJ0aW1lc3RhbXAiOjE3MzUwNDU3MzZ9XSwic2Vzc2lvbl9pZCI6ImMzODY4OWY5LWYwYjMtNGU3MS05NmE5LTQyNWE0NThkZDkwNyIsImlzX2Fub255bW91cyI6ZmFsc2V9.uYE3xmYo444psLDclrLVlDeHPcGBWxgyY71wA8ESL38',
-                  refresh_token='L2hQtXsxfu00VgnJ3_cWdg', expires_in=3600, expires_at=1735049336, token_type='bearer',
-                  user=User(id='6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6',
-                            app_metadata={'provider': 'email', 'providers': ['email']},
-                            user_metadata={'email': 'ptrkhh@outlook.com', 'email_verified': False,
-                                           'phone_verified': False, 'sub': '6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6'},
-                            aud='authenticated',
-                            confirmation_sent_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 362936,
-                                                                   tzinfo=TzInfo(UTC)),
-                            recovery_sent_at=datetime.datetime(2024, 12, 24, 13, 8, 41, 555390, tzinfo=TzInfo(UTC)),
-                            email_change_sent_at=None, new_email=None, new_phone=None, invited_at=None,
-                            action_link=None, email='ptrkhh@outlook.com', phone='',
-                            created_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 353621, tzinfo=TzInfo(UTC)),
-                            confirmed_at=datetime.datetime(2024, 12, 24, 12, 40, 15, 93668, tzinfo=TzInfo(UTC)),
-                            email_confirmed_at=datetime.datetime(2024, 12, 24, 12, 40, 15, 93668, tzinfo=TzInfo(UTC)),
-                            phone_confirmed_at=None,
-                            last_sign_in_at=datetime.datetime(2024, 12, 24, 13, 8, 56, 951181, tzinfo=TzInfo(UTC)),
-                            role='authenticated',
-                            updated_at=datetime.datetime(2024, 12, 24, 13, 8, 56, 954467, tzinfo=TzInfo(UTC)),
-                            identities=[UserIdentity(id='6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6',
-                                                     identity_id='436594b2-caa0-4dbc-a7bf-659d2552d736',
-                                                     user_id='6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6',
-                                                     identity_data={'email': 'ptrkhh@outlook.com',
-                                                                    'email_verified': False, 'phone_verified': False,
-                                                                    'sub': '6d62d952-d8c8-4ea9-ad45-c17fc8df2ac6'},
-                                                     provider='email',
-                                                     created_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 359931,
-                                                                                  tzinfo=TzInfo(UTC)),
-                                                     last_sign_in_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 359880,
-                                                                                       tzinfo=TzInfo(UTC)),
-                                                     updated_at=datetime.datetime(2024, 12, 24, 12, 39, 57, 359931,
-                                                                                  tzinfo=TzInfo(UTC)))],
-                            is_anonymous=False, factors=None))
+import os
+from typing import List
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+
+from backend.entities.vehicle_model import VehicleModel
+from sqlmodel import select
+from sqlmodel import Session
+
+load_dotenv()
+engine =  create_engine(os.environ.get("POSTGRES_URL"))
+sess = Session(engine)
+statement = select(VehicleModel)
+# results: List[VehicleModel] = sess.exec(statement).all()
+results: List[VehicleModel] = sess.exec(statement).all()
+print(results)

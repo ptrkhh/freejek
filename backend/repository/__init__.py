@@ -1,4 +1,4 @@
-from sqlalchemy.engine import Engine
+from sqlalchemy import Engine
 from supabase import Client
 
 from backend.repository.location_history import RepositoryLocationHistory

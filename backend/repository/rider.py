@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy.engine import Engine
+from sqlalchemy import Engine
 from sqlmodel import Session
 from sqlmodel import select
 
@@ -14,7 +14,7 @@ class RepositoryRider:
     def get_by_email(self, email: str, session: Session = None) -> Rider:
         sess = session if session else Session(self.engine)
         statement = select(Rider).where(Rider.email == email)
-        results: Rider = sess.execute(statement).scalars().one()
+        results: Rider = sess.exec(statement).one()
         if session is None:
             sess.close()
         return results
@@ -22,7 +22,7 @@ class RepositoryRider:
     def get_by_auth_id(self, auth_id: UUID, session: Session = None) -> Rider:
         sess = session if session else Session(self.engine)
         statement = select(Rider).where(Rider.auth_id == auth_id)
-        results: Rider = sess.execute(statement).scalars().one()
+        results: Rider = sess.exec(statement).one()
         if session is None:
             sess.close()
         return results

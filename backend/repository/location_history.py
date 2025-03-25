@@ -1,4 +1,4 @@
-from sqlalchemy.engine import Engine
+from sqlalchemy import Engine
 from sqlmodel import Session
 
 from backend.entities.location_history import LocationHistory

@@ -3,7 +3,7 @@ import os
 from typing import List
 
 from dotenv import load_dotenv
-from sqlalchemy.engine import Engine
+from sqlalchemy import Engine
 from sqlmodel import create_engine, Session
 from supabase import create_client, Client
 
