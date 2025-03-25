@@ -1,14 +1,15 @@
 from typing import List
 from uuid import UUID
 
+from sqlalchemy.engine import Engine
 from sqlmodel import Session
-from sqlmodel import select, engine
+from sqlmodel import select
 
 from backend.entities.vehicle_unit import VehicleUnit
 
 
 class RepositoryVehicleUnit:
-    def __init__(self, engine: engine):
+    def __init__(self, engine: Engine):
         self.engine = engine
 
     def get_all(self, session: Session = None) -> List[VehicleUnit]:

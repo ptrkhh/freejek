@@ -3,7 +3,8 @@ import os
 from typing import List
 
 from dotenv import load_dotenv
-from sqlmodel import create_engine, Session, engine
+from sqlalchemy.engine import Engine
+from sqlmodel import create_engine, Session
 from supabase import create_client, Client
 
 from backend.entities.web_master_data import WebVehicleModel
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 class Controller:
     def __init__(self):
         load_dotenv()
-        self.postgres: engine = create_engine(os.environ.get("POSTGRES_URL"))
+        self.postgres: Engine = create_engine(os.environ.get("POSTGRES_URL"))
         self.supabase: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
         self.service = Service(Repository(self.postgres, self.supabase))
         self.logger = logging.getLogger(__name__)
@@ -32,16 +33,18 @@ class Controller:
             res = self.service.master_data.rider_list_all_vehicles(session=session, token=token)
         return res
 
-    def rider_sign_up(self, email: str, password: str):
+    def rider_sign_up(self, email: str):
         with Session(self.postgres) as session:
+            print("THE SESSION", session)
             print("THE SERVICE", self.service)
             print("THE RIDER AUTH", self.service.rider_auth)
-            res = self.service.rider_auth.rider_email_sign_up(email, password, session=session)
+            res = self.service.rider_auth.rider_email_sign_up(email, session=session)
             session.commit()
         return res
 
     def rider_sign_in(self, email: str, password: str):
         with Session(self.postgres) as session:
+            print("THE SESSION", session)
             print("THE SERVICE", self.service)
             print("THE RIDER AUTH", self.service.rider_auth)
             res = self.service.rider_auth.rider_email_sign_in(email, password, session=session)
@@ -50,12 +53,18 @@ class Controller:
 
     def rider_otp_request(self, email: str):
         with Session(self.postgres) as session:
+            print("THE SESSION", session)
+            print("THE SERVICE", self.service)
+            print("THE RIDER AUTH", self.service.rider_auth)
             res = self.service.rider_auth.rider_otp_request(email, session=session)
             session.commit()
         return res
 
-    def rider_otp_verify(self, email: str, otp: str):
+    def rider_otp_verify(self, email: str, otp: str, password: str):
         with Session(self.postgres) as session:
-            access_token, refresh_token = self.service.rider_auth.rider_otp_verify(email, otp, session=session)
+            print("THE SESSION", session)
+            print("THE SERVICE", self.service)
+            print("THE RIDER AUTH", self.service.rider_auth)
+            access_token, refresh_token = self.service.rider_auth.rider_email_otp_verify(email, otp, password, session=session)
             session.commit()
         return access_token, refresh_token

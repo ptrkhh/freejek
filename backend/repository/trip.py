@@ -1,7 +1,8 @@
 from typing import List, Union
 from uuid import UUID
 
-from sqlmodel import Session, engine, select, and_
+from sqlalchemy.engine import Engine
+from sqlmodel import Session, select, and_
 from sqlmodel.sql.expression import SelectOfScalar
 
 from backend.entities.latlon import LatLon
@@ -9,7 +10,7 @@ from backend.entities.trip import Trip, TripStatus
 
 
 class RepositoryTrip:
-    def __init__(self, engine: engine):
+    def __init__(self, engine: Engine):
         self.engine = engine
 
     def get_by_pickup_region(self, minlatlon: LatLon, maxlatlon: LatLon, session: Session = None) -> List[Trip]:

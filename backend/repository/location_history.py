@@ -1,10 +1,11 @@
-from sqlmodel import Session, engine
+from sqlalchemy.engine import Engine
+from sqlmodel import Session
 
 from backend.entities.location_history import LocationHistory
 
 
 class RepositoryLocationHistory:
-    def __init__(self, engine: engine):
+    def __init__(self, engine: Engine):
         self.engine = engine
 
     def insert_one(self, item: LocationHistory, session: Session = None) -> LocationHistory:

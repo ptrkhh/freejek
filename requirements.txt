@@ -3,3 +3,5 @@ supabase
 sqlmodel
 PyJWT
 streamlit-local-storage
+python-dotenv
+psycopg2-binary

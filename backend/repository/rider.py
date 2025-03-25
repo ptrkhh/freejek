@@ -1,13 +1,14 @@
 from uuid import UUID
 
+from sqlalchemy.engine import Engine
 from sqlmodel import Session
-from sqlmodel import select, engine
+from sqlmodel import select
 
 from backend.entities.rider import Rider
 
 
 class RepositoryRider:
-    def __init__(self, engine: engine):
+    def __init__(self, engine: Engine):
         self.engine = engine
 
     def get_by_email(self, email: str, session: Session = None) -> Rider:

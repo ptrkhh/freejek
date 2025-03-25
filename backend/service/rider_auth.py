@@ -12,7 +12,7 @@ class ServiceRiderAuth:
     def __init__(self, repository: Repository):
         self.repository = repository
 
-    def rider_email_sign_up(self, email: str, password: str, session: Session = None) -> None:
+    def rider_email_sign_up(self, email: str, session: Session = None) -> None:
         if not session:
             logging.warn("Session was not provided")
         try:
@@ -22,19 +22,14 @@ class ServiceRiderAuth:
         else:
             raise FileExistsError(f"Rider {email} already exists")
 
-        response = self.repository.supabase.auth.sign_in_with_otp({
+        self.repository.supabase.auth.sign_in_with_otp({
             'email': email,
             'type': "email",
             'options': {
                 # 'email_redirect_to': 'https://example.com/welcome',
             },
         })
-        print("THE RESPONSE", response)
-        self.repository.rider.insert_one(Rider(
-            auth_id=response.user.id,
-            email=email,
-            password=password,  # TODO do not plaintext
-        ), session=session)
+
 
     # def rider_email_sign_in(self, email: str, password: str, session: Session = None) -> Tuple[str, str]:
     #     if not session:
@@ -72,14 +67,14 @@ class ServiceRiderAuth:
         })
         return response
 
-    def rider_phone_otp_verify(self, phone: str, otp: str, session: Session = None):
+    def rider_phone_otp_verify(self, phone: str, otp: str, password: str, session: Session = None):
         # TODO convert to E164
-        return self._rider_otp_verify(phone, otp, "sms", session)
+        return self._rider_otp_verify(phone, otp, password,"sms", session)
 
-    def rider_email_otp_verify(self, email: str, otp: str, session: Session = None):
-        return self._rider_otp_verify(email, otp, "email", session)
+    def rider_email_otp_verify(self, email: str, otp: str, password: str, session: Session = None):
+        return self._rider_otp_verify(email, otp, password, "email", session)
 
-    def _rider_otp_verify(self, email: str, otp: str, type: str, session: Session = None):
+    def _rider_otp_verify(self, email: str, otp: str, password: str, type: str, session: Session = None):
         if not session:
             logging.warn("Session was not provided")
         response = self.repository.supabase.auth.verify_otp({
@@ -88,4 +83,9 @@ class ServiceRiderAuth:
             'type': type,
         })
         # TODO INSERT AUTH ID
+        self.repository.rider.insert_one(Rider(
+            auth_id=response.user.id,
+            email=email,
+            password=password,  # TODO do not plaintext
+        ), session=session)
         return response.session.access_token, response.session.refresh_token

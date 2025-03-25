@@ -11,7 +11,7 @@ class VehicleModel(SQLModel, table=True):
     __table_args__ = {'extend_existing': True}
 
     id: Optional[UUID] = Field(default=None, primary_key=True)
-    print("ID GENERATED")
+    print("ID GENERATED", id)
     capacity: int
     created_at: Optional[datetime.datetime]
     vehicle_class: int

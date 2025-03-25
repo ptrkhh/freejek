@@ -1,4 +1,4 @@
-from sqlmodel import engine
+from sqlalchemy.engine import Engine
 from supabase import Client
 
 from backend.repository.location_history import RepositoryLocationHistory
@@ -11,7 +11,7 @@ from backend.repository.vehicle_unit import RepositoryVehicleUnit
 
 
 class Repository:
-    def __init__(self, postgres: engine, supabase: Client):
+    def __init__(self, postgres: Engine, supabase: Client):
         self.postgres = postgres
         self.supabase = supabase
         self.vehicle_model = RepositoryVehicleModel(engine=postgres)
