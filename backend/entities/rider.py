@@ -29,3 +29,4 @@ class Rider(SQLModel, table=True):
     name: str | None = Field(default=None)
     phone: str | None = Field(default=None)
     photo: str | None = Field(default=None)
+    password: str | None = Field()

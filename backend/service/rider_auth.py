@@ -82,10 +82,15 @@ class ServiceRiderAuth:
             'token': otp,
             'type': type,
         })
-        # TODO INSERT AUTH ID
-        self.repository.rider.insert_one(Rider(
-            auth_id=response.user.id,
-            email=email,
-            password=password,  # TODO do not plaintext
-        ), session=session)
+        try:
+            existing_rider = self.repository.rider.get_by_email(email, session)
+            if existing_rider.password != password: # TODO do not plaintext
+                raise KeyError("WRONG PASSWORD")
+        except NoResultFound:
+            logging.info(f"Rider {email} signing up")
+            self.repository.rider.insert_one(Rider(
+                auth_id=response.user.id,
+                email=email,
+                password=password,  # TODO do not plaintext
+            ), session=session)
         return response.session.access_token, response.session.refresh_token

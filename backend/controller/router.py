@@ -56,7 +56,7 @@ class Controller:
             print("THE SESSION", session)
             print("THE SERVICE", self.service)
             print("THE RIDER AUTH", self.service.rider_auth)
-            res = self.service.rider_auth.rider_otp_request(email, session=session)
+            res = self.service.rider_auth.rider_email_otp_request(email, session=session)
             session.commit()
         return res
 

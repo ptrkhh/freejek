@@ -5,3 +5,5 @@ PyJWT
 streamlit-local-storage
 python-dotenv
 psycopg2-binary
+streamlit-folium
+streamlit-autorefresh

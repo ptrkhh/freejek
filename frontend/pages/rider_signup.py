@@ -4,9 +4,16 @@ import traceback
 import streamlit as st
 
 from backend.controller.router import Controller
+# from frontend.utils.nyoba import TEST, is_signed_in
+# print("THE TEST", TEST)
+
+from frontend.utils.token_handler import TokenHandler
 
 c = Controller()
+t = TokenHandler()
 
+if t.is_signed_in():
+    st.switch_page("main.py")
 # Session state initialization
 if 'step' not in st.session_state:
     st.session_state.step = 1
@@ -35,9 +42,7 @@ def verify_otp():
         print("KESINI1")
         access_token, refresh_token = c.rider_otp_verify(st.session_state.email, otp, password)
         print("KESINI2")
-        st.session_state["local_storage"].setItem("freejek_access_token", access_token)
-        print("KESINI3")
-        st.session_state["local_storage"].setItem("freejek_refresh_token", refresh_token)
+        t.store_token(access_token, refresh_token, "rider")
         print("KESINI4")
         st.success("Sign-up successful! Redirecting...")
         print("KESINI5")
