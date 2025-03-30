@@ -5,10 +5,12 @@ from uuid import UUID
 
 from sqlmodel import Session
 
-from backend.entities.latlon import LatLon
-from backend.entities.trip import Trip, is_trip_active, trip_status, TripStatus
-from backend.entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
+from data.latlon import LatLon
+from backend.entities.trip import Trip
+from data.trip_status import TripStatus, trip_status, is_trip_active
+from entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
 from backend.repository import Repository
+from backend.service.util import verify_token_rider
 
 
 class ServiceRiderTrip:
@@ -80,6 +82,34 @@ class ServiceRiderTrip:
         # store in database
         raise NotImplementedError  # TODO
 
+    def get_latest_trip(self, token: str, session: Session = None) -> GetTripResp:
+        email, phone, is_verified, method = verify_token_rider(token)
+        i = self.repository.trip.get_latest_by_rider_email(email=email, session=session)
+        return GetTripResp(
+            id=i.id,
+            accepted_at=i.accepted_at,
+            canceled_at=i.canceled_at,
+            comment_to_driver=i.comment_to_driver,
+            comment_to_rider=i.comment_to_rider,
+            completed_at=i.completed_at,
+            created_at=i.created_at,
+            dropoff=LatLon(lat=i.dropoff_lat, lon=i.dropoff_lon),
+            fare=i.fare,
+            passenger=i.passenger,
+            pickup=LatLon(lat=i.pickup_lat, lon=i.pickup_lon),
+            rate_to_driver=i.rate_to_driver,
+            rate_to_rider=i.rate_to_rider,
+            request=i.request,
+            started_at=i.started_at,
+            updated_at=i.updated_at,
+            vehicle_color=i.vehicle_color,
+            vehicle_plate=i.vehicle_plate,
+            driver_id=i.driver_id,
+            rider_id=i.rider_id,
+            vehicle_id=i.vehicle_id,
+            status=trip_status(i),
+        )
+
     def get_trips(self, rider_id: UUID, session: Session = None) -> List[GetTripsResp]:
         trips = self.repository.trip.get_by_rider_id(rider_id, session=session)
         return [GetTripsResp(
@@ -130,6 +160,7 @@ class ServiceRiderTrip:
             driver_id=i.driver_id,
             rider_id=i.rider_id,
             vehicle_id=i.vehicle_id,
+            status=trip_status(i),
         )
 
     def add_comment(self, trip_id: UUID, rider_id: UUID, rate: int = 0, comment: str = None, session: Session = None):

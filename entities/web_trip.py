@@ -4,7 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from backend.entities.latlon import LatLon
+from data.latlon import LatLon
+from data.trip_status import TripStatus
 
 
 class TripCreationReq(BaseModel):
@@ -68,3 +69,5 @@ class GetTripResp(BaseModel):
     driver_id: UUID | None
     rider_id: UUID
     vehicle_id: UUID | None
+
+    status: TripStatus

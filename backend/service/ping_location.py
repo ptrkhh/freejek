@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlmodel import Session
 
-from backend.entities.latlon import LatLon
+from data.latlon import LatLon
 from backend.entities.location_history import LocationHistory
 from backend.repository import Repository
 

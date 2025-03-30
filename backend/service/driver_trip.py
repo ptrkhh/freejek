@@ -5,9 +5,9 @@ from uuid import UUID
 
 from sqlmodel import Session
 
-from backend.entities.latlon import LatLon
-from backend.entities.trip import TripStatus, trip_status
-from backend.entities.web_trip import GetTripsResp
+from data.latlon import LatLon
+from data.trip_status import TripStatus, trip_status
+from entities.web_trip import GetTripsResp
 from backend.repository import Repository
 from backend.service.util import minmaxlatlon
 

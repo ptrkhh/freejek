@@ -5,8 +5,10 @@ from sqlalchemy import Engine
 from sqlmodel import Session, select, and_
 from sqlmodel.sql.expression import SelectOfScalar
 
-from backend.entities.latlon import LatLon
-from backend.entities.trip import Trip, TripStatus
+from data.latlon import LatLon
+from backend.entities.rider import Rider
+from backend.entities.trip import Trip
+from data.trip_status import TripStatus
 
 
 class RepositoryTrip:
@@ -47,6 +49,19 @@ class RepositoryTrip:
         statement = select(Trip).where(Trip.driver_id == driver_id)
         statement = self._filter_by_status(status, statement)
         results: List[Trip] = sess.exec(statement).all()
+        if session is None:
+            sess.close()
+        return results
+
+    def get_latest_by_rider_email(self, email: str, session: Session = None) -> Trip:
+        sess = session if session else Session(self.engine)
+        statement = (
+            select(Trip)
+            .join(Rider, Trip.rider_id == Rider.email)
+            .where(Rider.email == email)
+            .order_by(Trip.created_at, ascending=False)
+        )
+        results: Trip = sess.exec(statement).first()
         if session is None:
             sess.close()
         return results

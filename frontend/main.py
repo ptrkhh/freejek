@@ -1,11 +1,14 @@
 import streamlit as st
 
 from backend.controller.router import Controller
+from frontend.utils.token_handler import TokenHandler
 
 st.session_state["controller"] = Controller()
+st.session_state["token_handler"] = TokenHandler()
 
-st.title("FREEJEK ALWAYS FREE")
+st.title("FREEJEK ALWAYS FREE AF")
 
+# TODO ask GPS permission. NO GPS = NO USE
 # TODO sidebar
 # if token not exist: rider signin, driver signin
 # if token rider:

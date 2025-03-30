@@ -1,5 +1,4 @@
 import datetime
-from enum import Enum
 from sqlmodel import Field, SQLModel
 from typing import Optional
 from uuid import UUID
@@ -38,36 +37,3 @@ class Trip(SQLModel, table=True):
     driver_id: UUID | None = Field(default=None, foreign_key="driver.id")
     rider_id: UUID = Field(foreign_key="rider.id")
     vehicle_id: UUID | None = Field(default=None, foreign_key="vehicle_unit.id")
-
-
-class TripStatus(Enum):
-    CANCELED = "CANCELED"
-    COMPLETED = "COMPLETED"
-    ONGOING = "ONGOING"
-    ACCEPTED = "ACCEPTED"
-    AVAILABLE = "AVAILABLE"
-
-
-def trip_status(trip: Trip) -> str:
-    if trip.canceled_at:
-        return TripStatus.CANCELED.value
-    if trip.completed_at:
-        return TripStatus.COMPLETED.value
-    if trip.started_at:
-        return TripStatus.ONGOING.value
-    if trip.accepted_at:
-        return TripStatus.ACCEPTED.value
-    return TripStatus.AVAILABLE.value
-
-
-def is_trip_active(trip: Trip) -> bool:
-    status = trip_status(trip)
-    if status == TripStatus.CANCELED:
-        return False
-    if status == TripStatus.COMPLETED:
-        return False
-    return True
-
-
-def available_for_driver(trip: Trip) -> bool:
-    return TripStatus.PENDING == trip_status(trip)

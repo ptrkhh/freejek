@@ -3,7 +3,7 @@ from typing import List
 from sqlmodel import Session
 
 from backend.entities.vehicle_model import VehicleModel
-from backend.entities.web_master_data import WebVehicleModel
+from entities.web_master_data import WebVehicleModel
 from backend.repository import Repository
 
 
