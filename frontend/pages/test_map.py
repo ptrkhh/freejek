@@ -2,9 +2,13 @@ import streamlit as st
 import folium
 import random
 import time
+
+from streamlit_autorefresh import st_autorefresh
 from streamlit_folium import st_folium
 
 center_lat, center_lon = 39.949610, -75.150282
+last_count = 0
+count = st_autorefresh(interval=2000, key="fizzbuzzcounter")
 
 def update_position():
     random_lat = center_lat + random.uniform(-0.001, 0.001)
@@ -23,6 +27,7 @@ out = st_folium(
 
 st.text_input(label="something")
 
-while True:
-    time.sleep(1)
+if count != last_count:
+    last_count = count
     fg.add_child(update_position())
+
