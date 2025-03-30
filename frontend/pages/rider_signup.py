@@ -9,7 +9,7 @@ from backend.controller.router import Controller
 
 from frontend.utils.token_handler import TokenHandler
 
-c = Controller()
+c = st.session_state.controller
 t = TokenHandler()
 
 if t.is_signed_in():

@@ -68,3 +68,5 @@ class Controller:
             access_token, refresh_token = self.service.rider_auth.rider_email_otp_verify(email, otp, password, session=session)
             session.commit()
         return access_token, refresh_token
+
+    def rider_get_latest_trip(self, ):

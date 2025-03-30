@@ -1,7 +1,30 @@
 import folium
 import pandas as pd
+import requests
 import streamlit as st
 from streamlit_folium import st_folium
+
+
+@st.cache_data
+def _get_all_state_bounds() -> dict:
+    url = "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json"
+    return requests.get(url).json()
+
+
+@st.cache_data
+def get_state_bounds(state: str) -> dict:
+    data = _get_all_state_bounds()
+    state_entry = next(f for f in data["features"] if f["properties"]["name"] == state)
+    return {"type": "FeatureCollection", "features": [state_entry]}
+
+center = None
+if "last_object_clicked" not in st.session_state:
+    st.session_state["last_object_clicked"] = None
+if st.session_state["last_object_clicked"]:
+    center = st.session_state["last_object_clicked"]
+if "selected_state" not in st.session_state:
+    st.session_state["selected_state"] = "Indiana"
+bounds = get_state_bounds(st.session_state["selected_state"])
 
 m = folium.Map(location=[39.8283, -98.5795], zoom_start=5)
 
