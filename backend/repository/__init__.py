@@ -1,6 +1,7 @@
 from sqlalchemy import Engine
 from supabase import Client
 
+from backend.repository.driver import RepositoryDriver
 from backend.repository.location_history import RepositoryLocationHistory
 from backend.repository.osm import RepositoryOsm
 from backend.repository.rider import RepositoryRider
@@ -17,6 +18,7 @@ class Repository:
         self.vehicle_model = RepositoryVehicleModel(engine=postgres)
         self.vehicle_unit = RepositoryVehicleUnit(engine=postgres)
         self.rider = RepositoryRider(engine=postgres)
+        self.driver = RepositoryDriver(engine=postgres)
         self.trip = RepositoryTrip(engine=postgres)
         self.location_history = RepositoryLocationHistory(engine=postgres)
         self.osm = RepositoryOsm()

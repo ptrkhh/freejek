@@ -4,6 +4,6 @@ sqlmodel
 PyJWT
 streamlit-local-storage
 python-dotenv
-psycopg2-binary
+psycopg2-binary  # needed for sqlmodel
 streamlit-folium
 streamlit-autorefresh
