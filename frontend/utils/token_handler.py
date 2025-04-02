@@ -1,16 +1,17 @@
 import os
 from typing import Literal, Optional
 
-from streamlit_local_storage import LocalStorage
-import streamlit as st
-from data.constant import ACCESS_TOKEN, REFRESH_TOKEN
 import jwt
-import datetime
+import streamlit as st
+from streamlit_local_storage import LocalStorage
+
+from data.constant import ACCESS_TOKEN, REFRESH_TOKEN
 
 
 class TokenHandler:
     def __init__(self):
-        self.ls : LocalStorage = LocalStorage()
+        self.ls: LocalStorage = LocalStorage()
+        self.secret_key: str = os.environ.get("JWT_SECRET")
 
     def is_signed_in(self):
         if ACCESS_TOKEN in st.session_state and REFRESH_TOKEN in st.session_state:
@@ -29,6 +30,13 @@ class TokenHandler:
             st.session_state[REFRESH_TOKEN] = self.ls.getItem(REFRESH_TOKEN)
             return st.session_state[ACCESS_TOKEN], st.session_state[REFRESH_TOKEN]
         return None, None
+
+    def get_email(self):
+        access_token, refresh_token = self.get_token()
+        if not access_token:
+            return None
+        payload = jwt.decode(access_token, self.secret_key, algorithms=["HS256"])
+        return payload.get("email")
 
     def store_token(self, access_token, refresh_token, status: Optional[Literal["driver", "rider"]] = None):
         if status:

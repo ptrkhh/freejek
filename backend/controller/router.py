@@ -1,12 +1,14 @@
 import logging
 import os
 from typing import List
+from uuid import UUID
 
 from dotenv import load_dotenv
 from sqlalchemy import Engine
 from sqlmodel import create_engine, Session
 from supabase import create_client, Client
 
+from data.latlon import LatLon
 from entities.web_master_data import WebVehicleModel
 from backend.repository import Repository
 from backend.service import Service
@@ -70,8 +72,33 @@ class Controller:
 
     def rider_get_latest_trip(self, token: str):
         with Session(self.postgres) as session:
-            trip = self.service.rider_trip.get_latest_trip(
-                token,
+            res = self.service.rider_trip.get_latest_trip(
+                token=token,
                 session=session,
             )
-        return trip
+        return res
+
+    def rider_ping_location(self, loc: LatLon, email: str, trip_id: UUID):
+        with Session(self.postgres) as session:
+            self.service.ping_location.ping_rider_location(loc, email, trip_id, session)
+            session.commit()
+        return
+
+    def rider_fetch_driver_location(self, driver_id: UUID, timeout: int = 300) -> List[LatLon]:
+        with Session(self.postgres) as session:
+            res = self.service.ping_location.fetch_driver_location(
+                driver_id=driver_id,
+                timeout=timeout,
+                session=session,
+            )
+        return res
+
+    def rider_fetch_nearby_drivers(self, loc: LatLon, radius: int = 1000, timeout: int = 300) -> List[LatLon]:
+        with Session(self.postgres) as session:
+            res = self.service.ping_location.fetch_nearby_drivers(
+                loc=loc,
+                radius=radius,
+                timeout=timeout,
+                session=session,
+            )
+        return res

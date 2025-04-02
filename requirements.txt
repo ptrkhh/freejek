@@ -7,3 +7,4 @@ python-dotenv
 psycopg2-binary  # needed for sqlmodel
 streamlit-folium
 streamlit-autorefresh
+streamlit-js-eval

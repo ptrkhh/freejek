@@ -1,7 +1,9 @@
+import traceback
 from typing import List
 
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
+from streamlit_js_eval import get_geolocation
 
 from backend.controller.router import Controller
 from data.latlon import LatLon
@@ -28,19 +30,52 @@ last_trip: GetTripResp = st.session_state.last_trip
 
 if count != st.session_state.last_count:  # TODO if failure = fine
     last_count = count
-    # TODO update my location
-    # TODO ping my location to cloud
+    try:
+        location = get_geolocation()
+        # {'coords': {'accuracy': 119, 'altitude': None, 'altitudeAccuracy': None, 'heading': None, 'latitude': -6.170324666666668, 'longitude': 106.79115449999998, 'speed': None}, 'timestamp': 1743616376830}
+        if location:
+            st.session_state["my_location"] = LatLon(
+                lat=location["coords"]["latitude"],
+                lon=location["coords"]["longitude"],
+            )
+            c.rider_ping_location(
+                loc=st.session_state["my_location"],
+                email=t.get_email(),
+                trip_id=last_trip.id,
+            )
+    except Exception as e:
+        print("ERROR", e)
+        traceback.print_exc()
 
     if last_trip.status in [TripStatus.ACCEPTED, TripStatus.ONGOING]:
-        pass
-        # TODO update driver location
+        try:
+            driver_locations = c.rider_fetch_driver_location(
+                driver_id=last_trip.driver_id,
+            )
+            st.session_state["driver_location"] = driver_locations[0]  # TODO trailpath
+        except Exception as e:
+            print("ERROR", e)
+            traceback.print_exc()
 
     if count % 3 == 0:
-        pass
-        # TODO update last trip
-        if last_trip.status == TripStatus.AVAILABLE:
-            pass
-            # TODO update nearby drivers
+        try:
+            st.session_state["last_trip"] = c.rider_get_latest_trip(
+                token=t.get_token(),
+            )
+        except Exception as e:
+            print("ERROR", e)
+            traceback.print_exc()
+
+        if last_trip.status == TripStatus.AVAILABLE and st.session_state['my_location'].lat > 0.0:
+            try:
+                st.session_state['nearby_drivers'] = c.rider_fetch_nearby_drivers(
+                    loc=st.session_state['my_location'],
+                    radius=1000,  # TODO increasing if none were found
+                    timeout=300,
+                )
+            except Exception as e:
+                print("ERROR", e)
+                traceback.print_exc()
 
 if last_trip.status == TripStatus.AVAILABLE:
     pass
