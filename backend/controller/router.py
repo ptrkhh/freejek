@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import List
+from typing import List, Union
 from uuid import UUID
 
 from dotenv import load_dotenv
@@ -12,6 +12,7 @@ from data.latlon import LatLon
 from entities.web_master_data import WebVehicleModel
 from backend.repository import Repository
 from backend.service import Service
+from entities.web_trip import GetTripResp
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class Controller:
             session.commit()
         return res
 
-    def rider_otp_verify(self, email: str, otp: str, password: str):
+    def rider_otp_verify(self, email: str, otp: str, password: str) -> (str, str):
         with Session(self.postgres) as session:
             access_token, refresh_token = self.service.rider_auth.rider_email_otp_verify(
                 email=email,
@@ -70,7 +71,7 @@ class Controller:
             session.commit()
         return access_token, refresh_token
 
-    def rider_get_latest_trip(self, token: str):
+    def rider_get_latest_trip(self, token: str) -> Union[GetTripResp, None]:
         with Session(self.postgres) as session:
             res = self.service.rider_trip.get_latest_trip(
                 token=token,
@@ -78,7 +79,7 @@ class Controller:
             )
         return res
 
-    def rider_ping_location(self, loc: LatLon, email: str, trip_id: UUID):
+    def rider_ping_location(self, loc: LatLon, email: str, trip_id: UUID = None):
         with Session(self.postgres) as session:
             self.service.ping_location.ping_rider_location(loc, email, trip_id, session)
             session.commit()

@@ -57,9 +57,9 @@ class RepositoryTrip:
         sess = session if session else Session(self.engine)
         statement = (
             select(Trip)
-            .join(Rider, Trip.rider_id == Rider.email)
+            .join(Rider, Trip.rider_id == Rider.id)
             .where(Rider.email == email)
-            .order_by(Trip.created_at, ascending=False)
+            .order_by(Trip.created_at.desc())
         )
         results: Trip = sess.exec(statement).first()
         if session is None:

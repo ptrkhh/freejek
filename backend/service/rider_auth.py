@@ -1,5 +1,5 @@
 import logging
-from typing import Literal, Tuple
+from typing import Literal
 
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session
@@ -67,27 +67,29 @@ class ServiceRiderAuth:
         })
         return response
 
-    def rider_phone_otp_verify(self, phone: str, otp: str, password: str, session: Session = None):
+    def rider_phone_otp_verify(self, phone: str, otp: str, password: str, session: Session = None) -> (str, str):
         # TODO convert to E164
         return self._rider_otp_verify(phone, otp, password,"sms", session)
 
-    def rider_email_otp_verify(self, email: str, otp: str, password: str, session: Session = None):
+    def rider_email_otp_verify(self, email: str, otp: str, password: str, session: Session = None) -> (str, str):
         return self._rider_otp_verify(email, otp, password, "email", session)
 
-    def _rider_otp_verify(self, email: str, otp: str, password: str, type: str, session: Session = None):
+    def _rider_otp_verify(self, email: str, otp: str, password: str, type: str, session: Session = None) -> (str, str):
         if not session:
             logging.warn("Session was not provided")
-        response = self.repository.supabase.auth.verify_otp({
-            'email': email,
-            'token': otp,
-            'type': type,
-        })
+        is_new_user = False
         try:
             existing_rider = self.repository.rider.get_by_email(email, session)
             if existing_rider.password != password: # TODO do not plaintext
                 raise KeyError("WRONG PASSWORD")
         except NoResultFound:
-            logging.info(f"Rider {email} signing up")
+            is_new_user = True
+        response = self.repository.supabase.auth.verify_otp({
+            'email': email,
+            'token': otp,
+            'type': type,
+        })
+        if is_new_user:
             self.repository.rider.insert_one(Rider(
                 auth_id=response.user.id,
                 email=email,

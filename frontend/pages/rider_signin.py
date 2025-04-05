@@ -38,13 +38,14 @@ def verify_otp():
     try:
         print("KESINI1")
         access_token, refresh_token = c.rider_otp_verify(st.session_state.email, otp, password)
-        print("KESINI2")
+        print("THE ACCESS TOKEN", type(access_token), access_token)
+        print("THE REFRESH TOKEN", type(refresh_token), refresh_token)
         t.store_token(access_token, refresh_token, "rider")
-        print("KESINI4")
+        print("KESINI2")
         st.success("Sign-up successful! Redirecting...")
-        print("KESINI5")
+        print("KESINI3")
         time.sleep(2)
-        print("KESINI6")
+        print("KESINI4")
         st.switch_page("main.py")
     except Exception as e:
         st.error("Sign-up failed. Please try again.")

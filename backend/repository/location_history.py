@@ -32,7 +32,7 @@ class RepositoryLocationHistory:
             select(LocationHistory)
             .where(LocationHistory.driver_id == driver_id)
             .where(LocationHistory.created_at > time_limit)
-            .order_by(LocationHistory.created_at, ascending=True)
+            .order_by(LocationHistory.created_at.asc())
         )
         results: List[LocationHistory] = sess.exec(statement).all()
         if session is None:
@@ -48,7 +48,7 @@ class RepositoryLocationHistory:
             select(LocationHistory)
             .where(LocationHistory.rider_id == rider_id)
             .where(LocationHistory.created_at > time_limit)
-            .order_by(LocationHistory.created_at, ascending=True)
+            .order_by(LocationHistory.created_at.asc())
         )
         results: List[LocationHistory] = sess.exec(statement).all()
         if session is None:
@@ -69,7 +69,7 @@ class RepositoryLocationHistory:
             .where(LocationHistory.lon > locmin.lon)
             .where(LocationHistory.lon < locmax.lon)
             .where(LocationHistory.created_at > time_limit)
-            .order_by(LocationHistory.created_at, ascending=False)
+            .order_by(LocationHistory.created_at.desc())
             .group_by(LocationHistory.driver_id)
         )
         results: List[LocationHistory] = sess.exec(statement).all()

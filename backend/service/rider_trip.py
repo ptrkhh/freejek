@@ -1,16 +1,16 @@
 import logging
 from datetime import datetime
-from typing import Literal, List
+from typing import Literal, List, Union
 from uuid import UUID
 
 from sqlmodel import Session
 
-from data.latlon import LatLon
 from backend.entities.trip import Trip
-from data.trip_status import TripStatus, trip_status, is_trip_active
-from entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
 from backend.repository import Repository
 from backend.service.util import verify_token_rider
+from data.latlon import LatLon
+from data.trip_status import TripStatus, trip_status, is_trip_active
+from entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
 
 
 class ServiceRiderTrip:
@@ -82,9 +82,11 @@ class ServiceRiderTrip:
         # store in database
         raise NotImplementedError  # TODO
 
-    def get_latest_trip(self, token: str, session: Session = None) -> GetTripResp:
+    def get_latest_trip(self, token: str, session: Session = None) -> Union[GetTripResp, None]:
         email, phone, is_verified, method = verify_token_rider(token)
         i = self.repository.trip.get_latest_by_rider_email(email=email, session=session)
+        if not i:
+            return None
         return GetTripResp(
             id=i.id,
             accepted_at=i.accepted_at,

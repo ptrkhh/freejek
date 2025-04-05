@@ -10,7 +10,7 @@ from data.latlon import LatLon
 def verify_token_driver(token: str) -> Tuple[str, str, bool, str]:
     secret_key = os.environ.get("JWT_SECRET")
 
-    payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+    payload = jwt.decode(token, secret_key, audience="authenticated", algorithms=["HS256"])
 
     if payload.get("driver_or_rider") != "driver":
         raise ValueError("driver_or_rider must be driver")
@@ -29,8 +29,8 @@ def verify_token_driver(token: str) -> Tuple[str, str, bool, str]:
 
 def verify_token_rider(token: str) -> Tuple[str, str, bool, str]:
     secret_key = os.environ.get("JWT_SECRET")
-
-    payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+    print("THE TOKEN", type(token), token)
+    payload = jwt.decode(token, secret_key, audience="authenticated", algorithms=["HS256"])
 
     if payload.get("driver_or_rider") != "rider":
         raise ValueError("driver_or_rider must be rider")
