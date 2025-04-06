@@ -1,7 +1,6 @@
 import datetime
+import uuid
 from enum import Enum
-from typing import Optional
-from uuid import UUID
 
 from sqlmodel import SQLModel, Field
 
@@ -10,10 +9,12 @@ class VehicleModel(SQLModel, table=True):
     __tablename__ = "vehicle_model"
     __table_args__ = {'extend_existing': True}
 
-    id: Optional[UUID] = Field(default=None, primary_key=True)
-    print("ID GENERATED", id)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     capacity: int
-    created_at: Optional[datetime.datetime]
+    created_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc),
+        nullable=False
+    )
     vehicle_class: int
     make: str
     model: str

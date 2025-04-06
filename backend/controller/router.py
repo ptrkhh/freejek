@@ -71,6 +71,9 @@ class Controller:
             session.commit()
         return access_token, refresh_token
 
+    def rider_refresh_token(self, refresh_token: str) -> (str, str):
+        return self.service.rider_auth.refresh_token(refresh_token)
+
     def rider_get_latest_trip(self, token: str) -> Union[GetTripResp, None]:
         with Session(self.postgres) as session:
             res = self.service.rider_trip.get_latest_trip(

@@ -1,60 +1,40 @@
-import traceback
+import os
 
 import folium
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 from streamlit_folium import st_folium
-from streamlit_js_eval import get_geolocation
 
-from backend.controller.router import Controller
-from data.latlon import LatLon
-from frontend.utils.location_handler import LocationHandler
-from frontend.utils.token_handler import TokenHandler
-from frontend.utils.trip_handler import TripHandler
+from frontend.utils.init import init
 
-c = Controller()
-st.session_state["controller"] = c
-t = TokenHandler()
-st.session_state["token_handler"] = t
-l = LocationHandler(c, t)
-st.session_state["location_handler"] = l
-tr = TripHandler(c, t)
-st.session_state["trip_handler"] = tr
-
+c, t, l, tr = init()
 st.title("FREEJEK ALWAYS FREE AF")
+st.write("Your Location:", l.current_location.as_tuple())
 
 if 'last_count' not in st.session_state:
     l.update_initial_location()
     st.session_state['last_count'] = 0
-count = st_autorefresh(interval=2000)  # TODO env var
-
-
-def update_position():
-    st.write("Your Location:", l.current_location.as_tuple())
-    return folium.CircleMarker(l.current_location.as_list())
-
 
 fg = folium.FeatureGroup(name="Moving Marker")
-fg.add_child(update_position())
-out = st_folium(
-    folium.Map(location=l.current_location.as_list(), zoom_start=16),
-    feature_group_to_add=fg,
-    width=1200,
-    height=500,
-)
+if l.initial_location.is_zero():
+    st.title("Acquiring your location...")
+else:
+    out = st_folium(
+        folium.Map(location=l.initial_location.as_list(), zoom_start=16),
+        feature_group_to_add=fg,
+        width=1200,
+        height=500,
+    )
 
 st.text_input(label="something")
 
-if count != st.session_state.last_count:  # TODO if failure = fine
-    last_count = count
-    try:
-        l.update()
-    except Exception as e:
-        print("ERROR", e)
-        traceback.print_exc()
-    fg.add_child(update_position())
+count = st_autorefresh(interval=os.environ.get("PING_DELAY_IDLE", 15) * 1000)
 
-# TODO ask GPS permission. NO GPS = NO USE
+if count != st.session_state.last_count:
+    last_count = count
+    l.update()
+    fg.add_child(folium.CircleMarker(l.current_location.as_list()))
+
 # TODO sidebar
 # if token not exist: rider signin, driver signin
 # if token rider:

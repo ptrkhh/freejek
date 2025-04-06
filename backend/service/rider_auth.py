@@ -96,3 +96,7 @@ class ServiceRiderAuth:
                 password=password,  # TODO do not plaintext
             ), session=session)
         return response.session.access_token, response.session.refresh_token
+
+    def refresh_token(self, refresh_token: str) -> (str, str):
+        resp = self.repository.supabase.auth.refresh_session(refresh_token)
+        return resp.session.access_token, resp.session.refresh_token
