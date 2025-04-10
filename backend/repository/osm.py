@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import requests
 
-from data.latlon import LatLon
+from entities.latlon import LatLon
 
 
 class RepositoryOsm:

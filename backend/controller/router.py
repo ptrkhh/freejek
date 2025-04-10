@@ -8,7 +8,7 @@ from sqlalchemy import Engine
 from sqlmodel import create_engine, Session
 from supabase import create_client, Client
 
-from data.latlon import LatLon
+from entities.latlon import LatLon
 from entities.web_master_data import WebVehicleModel
 from backend.repository import Repository
 from backend.service import Service

@@ -4,8 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from data.latlon import LatLon
-from data.trip_status import TripStatus
+from entities.latlon import LatLon
+from entities.trip_status import TripStatus
 
 
 class TripCreationReq(BaseModel):

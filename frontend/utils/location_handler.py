@@ -8,7 +8,7 @@ from uuid import UUID
 from streamlit_js_eval import get_geolocation
 
 from backend.controller.router import Controller
-from data.latlon import LatLon, latlon_distance
+from entities.latlon import LatLon, latlon_distance
 from frontend.utils.token_handler import TokenHandler
 
 

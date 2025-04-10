@@ -8,8 +8,8 @@ from sqlmodel import Session
 from backend.entities.trip import Trip
 from backend.repository import Repository
 from backend.service.util import verify_token_rider
-from data.latlon import LatLon
-from data.trip_status import TripStatus, trip_status, is_trip_active
+from entities.latlon import LatLon
+from entities.trip_status import TripStatus, trip_status, is_trip_active
 from entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
 
 

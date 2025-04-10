@@ -7,8 +7,8 @@ from streamlit_autorefresh import st_autorefresh
 from streamlit_folium import st_folium
 
 from backend.controller.router import Controller
-from data.latlon import LatLon
-from data.trip_status import TripStatus
+from entities.latlon import LatLon
+from entities.trip_status import TripStatus
 from frontend.utils.location_handler import LocationHandler
 from frontend.utils.token_handler import TokenHandler
 from frontend.utils.trip_handler import TripHandler

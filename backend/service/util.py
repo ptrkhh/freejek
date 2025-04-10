@@ -1,10 +1,7 @@
 import os
-from math import radians, cos, sin, atan2, sqrt
 from typing import Tuple
 
 import jwt
-
-from data.latlon import LatLon
 
 
 def verify_token_driver(token: str) -> Tuple[str, str, bool, str]:

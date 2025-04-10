@@ -5,10 +5,10 @@ from sqlalchemy import Engine
 from sqlmodel import Session, select, and_
 from sqlmodel.sql.expression import SelectOfScalar
 
-from data.latlon import LatLon
+from entities.latlon import LatLon
 from backend.entities.rider import Rider
 from backend.entities.trip import Trip
-from data.trip_status import TripStatus
+from entities.trip_status import TripStatus
 
 
 class RepositoryTrip:

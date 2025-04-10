@@ -7,7 +7,7 @@ from jwt import ExpiredSignatureError
 from streamlit_local_storage import LocalStorage
 
 from backend.controller.router import Controller
-from data.constant import ACCESS_TOKEN, REFRESH_TOKEN
+from entities.constant import ACCESS_TOKEN, REFRESH_TOKEN
 
 
 class TokenHandler:

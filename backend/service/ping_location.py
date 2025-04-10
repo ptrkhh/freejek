@@ -8,7 +8,7 @@ from backend.entities.location_history import LocationHistory
 from backend.entities.rider import Rider
 from backend.repository import Repository
 from backend.service.util import minmaxlatlon
-from data.latlon import LatLon
+from entities.latlon import LatLon
 
 
 class ServicePingLocation:

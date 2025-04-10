@@ -7,7 +7,7 @@ from sqlmodel import Session
 from sqlmodel import select
 
 from backend.entities.location_history import LocationHistory
-from data.latlon import LatLon
+from entities.latlon import LatLon
 
 
 class RepositoryLocationHistory:
