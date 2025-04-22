@@ -28,6 +28,14 @@ class RepositoryDriver:
             sess.close()
         return results
 
+    def get_by_id(self, id: UUID, session: Session = None) -> Driver:
+        sess = session if session else Session(self.engine)
+        statement = select(Driver).where(Driver.id == id)
+        results: Driver = sess.exec(statement).one()
+        if session is None:
+            sess.close()
+        return results
+
     def insert_one(self, item: Driver, session: Session = None) -> Driver:
         sess = session if session else Session(self.engine)
         sess.add(item)

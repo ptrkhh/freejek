@@ -7,8 +7,7 @@ from backend.entities.driver import Driver
 from backend.entities.location_history import LocationHistory
 from backend.entities.rider import Rider
 from backend.repository import Repository
-from backend.service.util import minmaxlatlon
-from entities.latlon import LatLon
+from entities.latlon import LatLon, latlon_boundary_cluster
 
 
 class ServicePingLocation:
@@ -44,7 +43,7 @@ class ServicePingLocation:
         return [LatLon(lat=i.lat, lon=i.lon) for i in locations] if locations else []
 
     def fetch_nearby_drivers(self, loc: LatLon, radius: int = 1000, timeout: int = 300, session: Session = None) -> List[LatLon]:
-        locmin, locmax = minmaxlatlon(loc, radius)
+        locmin, locmax = latlon_boundary_cluster(loc, radius)
         locations: List[LocationHistory] = self.repository.location_history.fetch_nearby_drivers(
             locmin=locmin,
             locmax=locmax,

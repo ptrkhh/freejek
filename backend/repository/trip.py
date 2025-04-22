@@ -5,9 +5,9 @@ from sqlalchemy import Engine
 from sqlmodel import Session, select, and_
 from sqlmodel.sql.expression import SelectOfScalar
 
-from entities.latlon import LatLon
 from backend.entities.rider import Rider
 from backend.entities.trip import Trip
+from entities.latlon import LatLon
 from entities.trip_status import TripStatus
 
 

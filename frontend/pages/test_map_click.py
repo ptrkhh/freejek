@@ -19,7 +19,7 @@ if not ("last_clicked_lat" in st.session_state and "last_clicked_lon" in st.sess
     st.session_state["last_clicked_lat"], st.session_state["last_clicked_lon"] = 0.0, 0.0
 if "last_count" not in st.session_state:
     st.session_state["last_count"] = 0
-count = st_autorefresh(interval=1000, key="fizzbuzzcounter")
+count = st_autorefresh(interval=5000, key="fizzbuzzcounter")
 
 
 def update_position():
@@ -31,26 +31,31 @@ def update_position2(lat, lon):
     print("ADDING CIRCLE MARKER AT", lat, lon)
     return folium.CircleMarker([lat, lon])
 
-
+def callback():
+    out = st.session_state["my_map"]["last_clicked"]
+    print("THE OUT", out)
+    if out and "lat" in out:
+        st.session_state["last_clicked_lat"] = out["lat"]
+        st.session_state["last_clicked_lon"] = out["lng"]
 
 fg = folium.FeatureGroup(name="Moving Marker")
-fg2 =  folium.FeatureGroup(name="Clicking Marker")
 fg.add_child(update_position())
 print("LAST CLICKED", st.session_state["last_clicked_lat"], st.session_state["last_clicked_lon"])
-fg2.add_child(update_position2(st.session_state["last_clicked_lat"], st.session_state["last_clicked_lon"]))
+fg.add_child(update_position2(st.session_state["last_clicked_lat"], st.session_state["last_clicked_lon"]))
 out = st_folium(
     folium.Map(location=[st.session_state["initial_lat"], st.session_state["initial_lon"]], zoom_start=16),
-    feature_group_to_add=[fg, fg2],
+    feature_group_to_add=fg,
     # center=(center_lat, center_lon),
     # width=1200,
     # height=500,
+    key="my_map",
+    on_change=callback,
 )
-print("THE OUT", out)
-
-if "last_clicked" in out and out["last_clicked"]:
-    print('THE LAST CLICKED1', out["last_clicked"])
-    st.session_state["last_clicked_lat"] = out["last_clicked"]["lat"]
-    st.session_state["last_clicked_lon"] = out["last_clicked"]["lng"]
+#
+# if "last_clicked" in out and out["last_clicked"]:
+#     print('THE LAST CLICKED1', out["last_clicked"])
+#     st.session_state["last_clicked_lat"] = out["last_clicked"]["lat"]
+#     st.session_state["last_clicked_lon"] = out["last_clicked"]["lng"]
 
 st.text_input(label="something")
 

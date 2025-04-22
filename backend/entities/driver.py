@@ -22,7 +22,7 @@ class Driver(SQLModel, table=True):
     )
     auth_id: uuid.UUID | None = Field(default=None)
     email: str | None = Field(default=None)
-    last_active: Optional[datetime.datetime]
+    last_active: datetime.datetime | None = Field(default=None)
     last_deactive: datetime.datetime | None = Field(default=None)
     license_number: str | None = Field(default=None)
     name: str | None = Field(default=None)

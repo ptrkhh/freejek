@@ -8,13 +8,11 @@ from sqlalchemy import Engine
 from sqlmodel import create_engine, Session
 from supabase import create_client, Client
 
-from entities.latlon import LatLon
-from entities.web_master_data import WebVehicleModel
 from backend.repository import Repository
 from backend.service import Service
+from entities.latlon import LatLon
+from entities.web_master_data import WebVehicleModel
 from entities.web_trip import GetTripResp
-
-logger = logging.getLogger(__name__)
 
 
 class Controller:
@@ -31,6 +29,9 @@ class Controller:
                 session=session,
             )
         return res
+
+    def driver_get_trip_path(self, orig: LatLon, dest: LatLon):
+        return self.service.driver_trip.get_trip_path(orig, dest)
 
     def rider_sign_up(self, email: str):
         with Session(self.postgres) as session:
@@ -82,6 +83,14 @@ class Controller:
             )
         return res
 
+    def rider_get_driver(self, driver_id: UUID) -> Union[GetDriverResp, None]:
+        with Session(self.postgres) as session:
+            res = self.service.rider_trip.get_driver(
+                driver_id=driver_id,
+                session=session,
+            )
+        return res
+
     def rider_ping_location(self, loc: LatLon, email: str, trip_id: UUID = None):
         with Session(self.postgres) as session:
             self.service.ping_location.ping_rider_location(loc, email, trip_id, session)
@@ -105,4 +114,18 @@ class Controller:
                 timeout=timeout,
                 session=session,
             )
+        return res
+
+    def rider_get_trip_path(self, orig: LatLon, dest: LatLon):
+        return self.service.rider_trip.get_trip_path(orig, dest)
+
+    def rider_rate_driver(self, rider_id: UUID, trip_id: UUID, stars: int, note: str):
+        with Session(self.postgres) as session:
+            res = self.service.rider_trip.add_comment(
+                rider_id=rider_id,
+                trip_id=trip_id,
+                rate=stars,
+                comment=note,
+            )
+            session.commit()
         return res

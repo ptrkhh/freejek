@@ -1,5 +1,4 @@
 import traceback
-from typing import List
 
 import folium
 import streamlit as st
@@ -23,76 +22,95 @@ if 'last_count' not in st.session_state:
     l.update_initial_location()
 if 'driver_location' not in st.session_state:
     st.session_state['driver_location']: LatLon = LatLon(lat=0.0, lon=0.0)  # TODO trailpath
-if 'nearby_drivers' not in st.session_state:
-    st.session_state['nearby_drivers']: List[LatLon] = []
 
 count = st_autorefresh(interval=5000)  # TODO env var
 
 fg = folium.FeatureGroup(name="Moving Marker")
+
+if tr.last_trip.status == TripStatus.AVAILABLE:
+    st.title("Searching for drivers...")
+    st.write("From:", str(tr.last_trip.pickup.as_list()))
+    st.write("To:", str(tr.last_trip.dropoff.as_list()))
+    st.write("Fare:", str(tr.last_trip.fare))
+    st.write("Request:", str(tr.last_trip.request))
+    if st.button("Edit Request"):
+        # TODO popup screen to change
+        pass
+    fg.add_child(folium.CircleMarker(l.current_location.as_list()))
+    for i in st.session_state["nearby_drivers"]:
+        fg.add_child(folium.Marker(i.as_list(), color="red"))
+    # TODO light blue path for destination
+
+
+elif tr.last_trip.status == TripStatus.ACCEPTED:
+    st.title("We found a driver! Keep your eyes for a...")
+    # TODO car picture
+    st.write(tr.last_trip.vehicle_color, tr.last_trip.vehicle_make, tr.last_trip.vehicle_model)
+    if 'driver_info' not in st.session_state:
+        st.session_state['driver_info'] = tr.get_driver()
+    if st.session_state['driver_info']:
+        driver = st.session_state['driver_info']
+        # TODO driver image
+        st.write(driver.name)
+        st.write(driver.phone)  # TODO WA and telegram link (wa.me/62blabla, t.me/+62blablabla)
+
+    st.write("Request:", tr.last_trip.request)
+    if st.button("Edit Request"):
+        # TODO popup screen to change
+        pass
+
+    fg.add_child(folium.CircleMarker(l.current_location.as_list()))
+    if st.session_state["driver_location"]:
+        fg.add_child(folium.CircleMarker(st.session_state["driver_location"].as_list(), color="red"))
+    if tr.get_route_path():
+        fg.add_child(folium.PolyLine([i.as_tuple() for i in tr.get_route_path()], color="lightblue"))
+
+elif tr.last_trip.status == TripStatus.ONGOING:
+    percentage_driven = 123  # TODO time percentage vs. distance percentage, whichever lowest
+    st.title(f"You are {percentage_driven}% there!")
+    st.write("From:", str(tr.last_trip.pickup.as_list()))
+    st.write("To:", str(tr.last_trip.dropoff.as_list()))
+    st.write("Fare:", str(tr.last_trip.fare))
+    st.write("Request:", tr.last_trip.request)
+    if st.button("Edit Request"):
+        # TODO popup screen to change
+        pass
+    fg.add_child(folium.CircleMarker(l.current_location.as_list()))
+    if st.session_state["driver_location"]:
+        fg.add_child(folium.CircleMarker(st.session_state["driver_location"].as_list(), color="red"))
+    if tr.get_route_path():
+        fg.add_child(folium.PolyLine([i.as_tuple() for i in tr.get_route_path()], color="lightblue"))
+
+elif tr.last_trip.status == TripStatus.COMPLETED:
+    st.title("Congratulations! Trip has been completed!")
+
+    st.write("From:", str(tr.last_trip.pickup.as_list()))
+    st.write("To:", str(tr.last_trip.dropoff.as_list()))
+    st.write("Fare:", str(tr.last_trip.fare))
+    driver_star = st.slider("Rate for driver")
+    driver_note = st.text_input("Rate for driver")
+    if st.button("Rate Driver"):
+        tr.rate_driver(
+            rider_id=tr.get_last_trip().rider_id,
+            trip_id=tr.get_last_trip().trip_id,
+            stars=driver_star,
+            note=driver_note,
+        )
+    fg.add_child(folium.CircleMarker(l.current_location.as_list()))
+
+
+elif tr.last_trip.status == TripStatus.CANCELED:
+    st.title("Congratulations! Trip has been completed!")
+    #
+    # Note from you: <INSERT NOTE>
+    # Note from driver: <INSERT NOTE>
+
 out = st_folium(
-    folium.Map(location=l.initial_location.as_list(), zoom_start=16),
+    folium.Map(location=l.initial_location.as_tuple(), zoom_start=16),
     feature_group_to_add=fg,
     width=1200,
     height=500,
 )
-
-if tr.last_trip.status == TripStatus.AVAILABLE:
-    st.title("Searching for drivers...")
-
-    fg.add_child(folium.CircleMarker(l.current_location.as_list()))
-    for i in st.session_state["nearby_drivers"]:
-        fg.add_child(folium.Marker(i.as_list()))
-
-    # Searching for drivers...
-    #
-    # From: <ADDRESS>
-    # To: <ADDRESS>
-    # Fare: <INSERT FARE>
-    # Note: <SOME TEXT>
-    # (button: Edit Request)
-    #
-    # Map: Blue dot for you, light blue path, red ring for other drivers
-
-
-elif tr.last_trip.status == TripStatus.ACCEPTED:
-    pass
-    # Watch out for...
-    # <car picture>
-    # Car: <color> <type>
-    # Phone: <phone> <WA link> <telegram link>
-    # Note:
-    #
-    #
-    # Your Note: <SOME TEXT>
-    # (button: Edit Request)
-    #
-    # Map: Blue dot for you, light blue path, red dot for the driver
-
-elif tr.last_trip.status == TripStatus.ONGOING:
-    pass
-    # You are xx % there! (time percentage vs. distance percentage, whichever lowest)
-    #
-    # Note: <SOME TEXT>
-    # Your Note: <SOME TEXT>
-    # (button: Edit Request)
-    #
-    # Map: Blue dot for you, light blue path, red dot for the driver
-
-elif tr.last_trip.status == TripStatus.COMPLETED:
-    pass
-    # Congratulations! Trip has been completed!
-    #
-    # From: <ADDRESS>
-    # To: <ADDRESS>
-    # Fare: <INSERT FARE>
-    # Map: Blue dot for you
-
-elif tr.last_trip.status == TripStatus.CANCELED:
-    pass
-    # Trip has been canceled! :(
-    #
-    # Note from you: <INSERT NOTE>
-    # Note from driver: <INSERT NOTE>
 
 if count != st.session_state.last_count:  # TODO if failure = fine
     last_count = count

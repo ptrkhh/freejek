@@ -5,11 +5,10 @@ from uuid import UUID
 
 from sqlmodel import Session
 
-from entities.latlon import LatLon
+from entities.latlon import LatLon, latlon_boundary_cluster
 from entities.trip_status import TripStatus, trip_status
 from entities.web_trip import GetTripsResp
 from backend.repository import Repository
-from backend.service.util import minmaxlatlon
 
 
 class ServiceDriverTrip:
@@ -18,7 +17,7 @@ class ServiceDriverTrip:
 
     def list_trips(self, loc: LatLon, radius_in_m: int, session: Session = None) -> List[
         GetTripsResp]:  # TODO page
-        minlatlon, maxlatlon = minmaxlatlon(loc=loc, cluster_size_in_meters=radius_in_m)
+        minlatlon, maxlatlon = latlon_boundary_cluster(loc=loc, cluster_size_in_meters=radius_in_m)
         trips = self.repository.trip.get_by_pickup_region(
             minlatlon=minlatlon,
             maxlatlon=maxlatlon,
@@ -57,13 +56,15 @@ class ServiceDriverTrip:
         other_trips = self.repository.trip.get_by_driver_id(driver_id, TripStatus.ONGOING, session=session)
         if len(other_trips) > 0:
             raise AssertionError(f"DRIVER {driver_id} IN ANOTHER TRIP")
-        vehicle = self.repository.vehicle_unit.get_by_id(vehicle_id, session=session)
-
+        vehicle_unit = self.repository.vehicle_unit.get_by_id(vehicle_id, session=session)
+        vehicle_model = self.repository.vehicle_model.get_by_id(vehicle_unit.vehicle_id, session=session)
         trip.accepted_at = datetime.now()
         trip.driver_id = driver_id
         trip.vehicle_id = vehicle_id
-        trip.vehicle_color = vehicle.color
-        trip.vehicle_plate = vehicle.plate
+        trip.vehicle_color = vehicle_unit.color
+        trip.vehicle_plate = vehicle_unit.plate
+        trip.vehicle_make = vehicle_model.make
+        trip.vehicle_model = vehicle_model.model
         self.repository.trip.update(trip, session=session)
 
     def complete_trip(self, trip_id: UUID, driver_id: UUID, session: Session = None) -> None:
@@ -95,3 +96,6 @@ class ServiceDriverTrip:
             logging.warn(f"TRIP {trip_id} COMMENT FROM DRIVER IS NONE")
 
         self.repository.trip.update(trip, session=session)
+
+    def get_trip_path(self, orig: LatLon, dest: LatLon):
+        return self.repository.osm.generate_path(orig, dest)

@@ -10,7 +10,7 @@ from backend.repository import Repository
 from backend.service.util import verify_token_rider
 from entities.latlon import LatLon
 from entities.trip_status import TripStatus, trip_status, is_trip_active
-from entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp
+from entities.web_trip import TripCreationReq, GetTripsResp, GetTripResp, GetDriverResp
 
 
 class ServiceRiderTrip:
@@ -106,10 +106,25 @@ class ServiceRiderTrip:
             updated_at=i.updated_at,
             vehicle_color=i.vehicle_color,
             vehicle_plate=i.vehicle_plate,
+            vehicle_make=i.vehicle_make,
+            vehicle_model=i.vehicle_model,
             driver_id=i.driver_id,
             rider_id=i.rider_id,
             vehicle_id=i.vehicle_id,
             status=trip_status(i),
+        )
+
+    def get_driver(self, driver_id: UUID, session: Session = None) -> GetDriverResp:
+        driver = self.repository.driver.get_by_id(driver_id, session=session)
+        return GetDriverResp(
+            id=driver.id,
+            updated_at=driver.updated_at,
+            created_at=driver.created_at,
+            last_active=driver.last_active,
+            last_deactive=driver.last_deactive,
+            name=driver.name,
+            phone=driver.phone,
+            photo_profile=driver.photo_profile,
         )
 
     def get_trips(self, rider_id: UUID, session: Session = None) -> List[GetTripsResp]:
@@ -159,6 +174,8 @@ class ServiceRiderTrip:
             updated_at=i.updated_at,
             vehicle_color=i.vehicle_color,
             vehicle_plate=i.vehicle_plate,
+            vehicle_make=i.vehicle_make,
+            vehicle_model=i.vehicle_model,
             driver_id=i.driver_id,
             rider_id=i.rider_id,
             vehicle_id=i.vehicle_id,
@@ -183,3 +200,7 @@ class ServiceRiderTrip:
             logging.warn(f"TRIP {trip_id} COMMENT FROM RIDER IS NONE")
 
         self.repository.trip.update(trip, session=session)
+
+    def get_trip_path(self, orig: LatLon, dest: LatLon):
+        return self.repository.osm.generate_path(orig, dest)
+

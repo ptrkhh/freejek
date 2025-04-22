@@ -37,8 +37,10 @@ class GetTripsResp(BaseModel):
     request: str | None
     started_at: datetime.datetime | None
     updated_at: datetime.datetime | None
-    vehicle_color: str
-    vehicle_plate: str
+    vehicle_color: str | None
+    vehicle_plate: str | None
+    vehicle_make: str | None
+    vehicle_model: str | None
 
     driver_id: UUID | None
     rider_id: UUID
@@ -63,11 +65,23 @@ class GetTripResp(BaseModel):
     request: str | None
     started_at: datetime.datetime | None
     updated_at: datetime.datetime | None
-    vehicle_color: str
-    vehicle_plate: str
+    vehicle_color: str | None
+    vehicle_plate: str | None
+    vehicle_make: str | None
+    vehicle_model: str | None
 
     driver_id: UUID | None
     rider_id: UUID
     vehicle_id: UUID | None
 
     status: TripStatus
+
+class GetDriverResp(BaseModel):
+    id: UUID
+    updated_at: datetime.datetime | None
+    created_at: datetime.datetime
+    last_active: datetime.datetime | None
+    last_deactive: datetime.datetime | None
+    name: str | None
+    phone: str | None
+    photo_profile: str | None
