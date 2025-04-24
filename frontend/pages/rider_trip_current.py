@@ -8,6 +8,7 @@ from streamlit_folium import st_folium
 from backend.controller.router import Controller
 from entities.latlon import LatLon
 from entities.trip_status import TripStatus
+from frontend.entities.session_state import RiderTripCurrent
 from frontend.utils.location_handler import LocationHandler
 from frontend.utils.token_handler import TokenHandler
 from frontend.utils.trip_handler import TripHandler
@@ -17,12 +18,14 @@ t: TokenHandler = st.session_state.token_handler
 l: LocationHandler = st.session_state.location_handler
 tr: TripHandler = st.session_state.trip_handler
 
-if 'last_count' not in st.session_state:
-    st.session_state['last_count'] = 0
-    l.update_initial_location()
-if 'driver_location' not in st.session_state:
-    st.session_state['driver_location']: LatLon = LatLon(lat=0.0, lon=0.0)  # TODO trailpath
-
+if 'rider_trip_current' not in st.session_state:
+    st.session_state["rider_trip_current"] = RiderTripCurrent(
+        last_count=0,
+        driver_info=None,
+        driver_location=None,
+        nearby_drivers=[],
+    )
+session_state: RiderTripCurrent = st.session_state["rider_trip_current"]
 count = st_autorefresh(interval=5000)  # TODO env var
 
 fg = folium.FeatureGroup(name="Moving Marker")
@@ -37,7 +40,7 @@ if tr.last_trip.status == TripStatus.AVAILABLE:
         # TODO popup screen to change
         pass
     fg.add_child(folium.CircleMarker(l.current_location.as_list()))
-    for i in st.session_state["nearby_drivers"]:
+    for i in session_state.nearby_drivers:
         fg.add_child(folium.Marker(i.as_list(), color="red"))
     # TODO light blue path for destination
 
@@ -46,13 +49,12 @@ elif tr.last_trip.status == TripStatus.ACCEPTED:
     st.title("We found a driver! Keep your eyes for a...")
     # TODO car picture
     st.write(tr.last_trip.vehicle_color, tr.last_trip.vehicle_make, tr.last_trip.vehicle_model)
-    if 'driver_info' not in st.session_state:
-        st.session_state['driver_info'] = tr.get_driver()
-    if st.session_state['driver_info']:
-        driver = st.session_state['driver_info']
+    if not session_state.driver_info:
+        session_state.driver_info = tr.get_driver()
+    if session_state.driver_info:
         # TODO driver image
-        st.write(driver.name)
-        st.write(driver.phone)  # TODO WA and telegram link (wa.me/62blabla, t.me/+62blablabla)
+        st.write(session_state.driver_info.name)
+        st.write(session_state.driver_info.phone)  # TODO WA and telegram link (wa.me/62blabla, t.me/+62blablabla)
 
     st.write("Request:", tr.last_trip.request)
     if st.button("Edit Request"):
@@ -60,8 +62,8 @@ elif tr.last_trip.status == TripStatus.ACCEPTED:
         pass
 
     fg.add_child(folium.CircleMarker(l.current_location.as_list()))
-    if st.session_state["driver_location"]:
-        fg.add_child(folium.CircleMarker(st.session_state["driver_location"].as_list(), color="red"))
+    if session_state.driver_location:
+        fg.add_child(folium.CircleMarker(session_state.driver_location.as_list(), color="red"))
     if tr.get_route_path():
         fg.add_child(folium.PolyLine([i.as_tuple() for i in tr.get_route_path()], color="lightblue"))
 
@@ -76,8 +78,8 @@ elif tr.last_trip.status == TripStatus.ONGOING:
         # TODO popup screen to change
         pass
     fg.add_child(folium.CircleMarker(l.current_location.as_list()))
-    if st.session_state["driver_location"]:
-        fg.add_child(folium.CircleMarker(st.session_state["driver_location"].as_list(), color="red"))
+    if session_state.driver_location:
+        fg.add_child(folium.CircleMarker(session_state.driver_location.as_list(), color="red"))
     if tr.get_route_path():
         fg.add_child(folium.PolyLine([i.as_tuple() for i in tr.get_route_path()], color="lightblue"))
 
@@ -112,8 +114,8 @@ out = st_folium(
     height=500,
 )
 
-if count != st.session_state.last_count:  # TODO if failure = fine
-    last_count = count
+if count != session_state.last_count:  # TODO if failure = fine
+    session_state.last_count = count
     try:
         l.update(tr.last_trip.id)
     except Exception as e:
@@ -125,7 +127,7 @@ if count != st.session_state.last_count:  # TODO if failure = fine
             driver_locations = c.rider_fetch_driver_location(
                 driver_id=tr.last_trip.driver_id,
             )
-            st.session_state["driver_location"] = driver_locations[0]  # TODO trailpath
+            session_state.driver_location = driver_locations[0]  # TODO trailpath
         except Exception as e:
             print("ERROR", e)
             traceback.print_exc()
@@ -139,7 +141,7 @@ if count != st.session_state.last_count:  # TODO if failure = fine
 
         if tr.last_trip.status == TripStatus.AVAILABLE:
             try:
-                st.session_state['nearby_drivers'] = c.rider_fetch_nearby_drivers(
+                session_state.nearby_drivers = c.rider_fetch_nearby_drivers(
                     loc=l.current_location,
                     radius=1000,  # TODO increasing if none were found
                     timeout=300,
