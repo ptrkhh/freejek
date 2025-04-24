@@ -37,6 +37,7 @@ def callback():
     if out and "lat" in out:
         st.session_state["last_clicked_lat"] = out["lat"]
         st.session_state["last_clicked_lon"] = out["lng"]
+    # fg.add_child(update_position2(st.session_state["last_clicked_lat"], st.session_state["last_clicked_lon"]))
 
 fg = folium.FeatureGroup(name="Moving Marker")
 fg.add_child(update_position())

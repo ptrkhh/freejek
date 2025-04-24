@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Literal, List, Union
+from typing import Literal, List, Union, Optional
 from uuid import UUID
 
 from sqlmodel import Session
@@ -202,5 +202,11 @@ class ServiceRiderTrip:
         self.repository.trip.update(trip, session=session)
 
     def get_trip_path(self, orig: LatLon, dest: LatLon):
-        return self.repository.osm.generate_path(orig, dest)
+        return self.repository.osm.generate_path(orig=orig, dest=dest)
 
+    def find_poi(self, orig: LatLon, q: Optional[str] = None):
+        return self.repository.osm.search_poi(
+            orig=orig,
+            q=q,
+            limit=10 if q else 100,
+        )

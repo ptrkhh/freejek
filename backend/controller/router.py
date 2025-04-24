@@ -1,8 +1,9 @@
 import logging
 import os
-from typing import List, Union
+from typing import List, Union, Optional
 from uuid import UUID
 
+from
 from dotenv import load_dotenv
 from sqlalchemy import Engine
 from sqlmodel import create_engine, Session
@@ -12,7 +13,7 @@ from backend.repository import Repository
 from backend.service import Service
 from entities.latlon import LatLon
 from entities.web_master_data import WebVehicleModel
-from entities.web_trip import GetTripResp
+from entities.web_trip import GetTripResp, GetDriverResp
 
 
 class Controller:
@@ -118,6 +119,9 @@ class Controller:
 
     def rider_get_trip_path(self, orig: LatLon, dest: LatLon):
         return self.service.rider_trip.get_trip_path(orig, dest)
+
+    def rider_search_poi(self, orig: LatLon, q: Optional[str] = None):
+        return self.service.rider_trip.find_poi(orig, q)
 
     def rider_rate_driver(self, rider_id: UUID, trip_id: UUID, stars: int, note: str):
         with Session(self.postgres) as session:
