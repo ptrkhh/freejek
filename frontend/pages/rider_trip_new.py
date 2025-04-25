@@ -7,8 +7,9 @@ from streamlit_autorefresh import st_autorefresh
 from streamlit_folium import st_folium
 
 from backend.controller.router import Controller
+from entities.constant import VEHICLE_CLASS_INDEX
 from entities.latlon import LatLon
-from entities.trip_status import TripStatus
+from entities.web_trip import FareCalculatorReq
 from frontend.entities.session_state import RiderTripNew
 from frontend.utils.location_handler import LocationHandler
 from frontend.utils.token_handler import TokenHandler
@@ -20,18 +21,7 @@ l: LocationHandler = st.session_state.location_handler
 tr: TripHandler = st.session_state.trip_handler
 
 if "rider_trip_new" not in st.session_state:
-    st.session_state["rider_trip_new"] = RiderTripNew(
-        last_count=0,
-        last_clicked=LatLon(lat=0, lon=0),
-        search_results=c.rider_search_poi(l.current_location),
-        search_query=None,
-        last_search_query=None,
-        pickup=l.current_location,
-        dropoff=l.current_location,
-        fare=0,
-        fare_pickup=None,
-        fare_dropoff=None,
-    )
+    st.session_state["rider_trip_new"] = RiderTripNew.zero_value(l.current_location)
 session_state: RiderTripNew = st.session_state["rider_trip_new"]
 
 count = st_autorefresh(interval=5000)  # TODO env var
@@ -73,46 +63,64 @@ if st.button("Set as PICKUP"):
 if st.button("Set as DROPOFF"):
     session_state.dropoff = session_state.last_clicked
 
-
 # Vehicle Type Selector
-vehicle_type = st.radio("Choose your vehicle type:", ["Car", "Bike"])
-vehicle_class = st.radio(
+vehicle_type: str = st.radio("Choose your vehicle type:", ["Car", "Motorcycle"])
+vehicle_class: int = st.radio(
     "Choose your vehicle class:",
-    ["Economy", "Premium Economy", "Business", "First Class"],
-    format_func=lambda x: x
+    range(len(VEHICLE_CLASS_INDEX)),
+    format_func=lambda x: VEHICLE_CLASS_INDEX[x],
 )
-
-vehicle_class_map = {# Economy = Caligra. Premium Economy = Xpanza. Business = Innoxy. First Class = Alphecedes
-    "Economy": 0,
-    "Premium Economy": 1,
-    "Business": 2,
-    "First Class": 3
-}
-
-
-selected_vehicle_class = vehicle_class_map[vehicle_class]
 
 passenger_count = st.slider("Passengers:", 1, 6, value=1, disabled=vehicle_type == "Bike")
 
 notes = st.text_area("Notes for the driver:")
 
-
-session_state.fare = calculate_fare()
-
-# Display calculated fare
-st.markdown(f"### Estimated Fare: Rp{session_state.fare:,}")
+if session_state.fare:
+    st.markdown(f"### Estimated Fare: Rp{session_state.fare:,}")
 
 # Big order button
 if st.button("🚗 ORDER RIDE"):
-    st.success("Ride Ordered!")
-    # You could also trigger backend logic here using trip_handler or other services
-    # tr.create_trip(...) etc.
-
-
+    try:
+        # TODO call order ride
+        st.success("Ride Ordered!")
+        # TODO wait 2s
+        # TODO redirect to current
+    except Exception as e:
+        # TODO report with ID
+        print(e)
+        print(traceback.format_exc())
+        st.error("Something went wrong!")
 
 if count != st.session_state.last_count:  # TODO if failure = fine
     last_count = count
-    # TODO when (pickup or dstination updated) and (pickup and destination) hit endpoint GET /route/v1/{profile}/{coordinates}?alternatives={true|false}&steps={true|false}&geometries={polyline|polyline6|geojson}&overview={full|simplified|false}&annotations={true|false}
+    req = session_state.fare_req
+    updated_pickup = session_state.pickup != req.orig if req else True
+    updated_dropoff = session_state.dropoff != req.dest if req else True
+    updated_vehicle_class = vehicle_class != req.vehicle_class if req else True
+    updated_vehicle_type = vehicle_type.lower() != req.vehicle_type.lower() if req else True
+    if updated_vehicle_type or updated_vehicle_class or updated_dropoff or updated_pickup:
+        try:
+            req = FareCalculatorReq(
+                orig=session_state.pickup,
+                dest=session_state.dropoff,
+                vehicle_class=vehicle_class,
+                vehicle_type="CAR" if vehicle_type.lower() == "car" else "MOTORCYCLE",
+            )
+            session_state.fare = c.fare_calculator(req)
+            session_state.fare_req = req
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
+            st.error("Something went wrong when calculating fare!")
 
+    if updated_pickup or updated_dropoff:
+        try:
+            session_state.path = c.rider_get_trip_path(session_state.pickup, session_state.dropoff)
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
+            st.error("Something went wrong when getting path!")
     if count % 3 == 0:
         pass
+
+st.session_state["rider_trip_new"] = session_state

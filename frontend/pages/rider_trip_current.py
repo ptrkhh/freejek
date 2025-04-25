@@ -19,12 +19,7 @@ l: LocationHandler = st.session_state.location_handler
 tr: TripHandler = st.session_state.trip_handler
 
 if 'rider_trip_current' not in st.session_state:
-    st.session_state["rider_trip_current"] = RiderTripCurrent(
-        last_count=0,
-        driver_info=None,
-        driver_location=None,
-        nearby_drivers=[],
-    )
+    st.session_state["rider_trip_current"] = RiderTripCurrent.zero_value()
 session_state: RiderTripCurrent = st.session_state["rider_trip_current"]
 count = st_autorefresh(interval=5000)  # TODO env var
 
@@ -149,3 +144,5 @@ if count != session_state.last_count:  # TODO if failure = fine
             except Exception as e:
                 print("ERROR", e)
                 traceback.print_exc()
+
+st.session_state["rider_trip_current"] = session_state

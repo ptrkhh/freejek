@@ -85,3 +85,9 @@ class GetDriverResp(BaseModel):
     name: str | None
     phone: str | None
     photo_profile: str | None
+
+class FareCalculatorReq(BaseModel):
+    orig: LatLon
+    dest: LatLon
+    vehicle_class: int
+    vehicle_type: Literal["CAR", "MOTORCYCLE"]

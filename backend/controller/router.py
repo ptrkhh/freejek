@@ -3,7 +3,6 @@ import os
 from typing import List, Union, Optional
 from uuid import UUID
 
-from
 from dotenv import load_dotenv
 from sqlalchemy import Engine
 from sqlmodel import create_engine, Session
@@ -13,7 +12,7 @@ from backend.repository import Repository
 from backend.service import Service
 from entities.latlon import LatLon
 from entities.web_master_data import WebVehicleModel
-from entities.web_trip import GetTripResp, GetDriverResp
+from entities.web_trip import GetTripResp, GetDriverResp, FareCalculatorReq
 
 
 class Controller:
@@ -132,4 +131,15 @@ class Controller:
                 comment=note,
             )
             session.commit()
+        return res
+
+    def fare_calculator(self, req: FareCalculatorReq):
+        with Session(self.postgres) as session:
+            res = self.service.rider_trip.fare_calculator(
+                orig=req.orig,
+                dest=req.dest,
+                vehicle_class=req.vehicle_class,
+                vehicle_type=req.vehicle_type,
+                session=session,
+            )
         return res

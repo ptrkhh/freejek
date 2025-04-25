@@ -20,7 +20,7 @@ class RepositoryOsm:
         return ([[j for j in i] for i in response.json()["distances"]],
                 [[j / 60 for j in i] for i in response.json()["durations"]])
 
-    def generate_path(self, orig: LatLon, dest: LatLon):
+    def generate_path(self, orig: LatLon, dest: LatLon) -> List[LatLon]:
         prefix = "http://router.project-osrm.org/route/v1/car/"
         suffix = "?steps=true"
 

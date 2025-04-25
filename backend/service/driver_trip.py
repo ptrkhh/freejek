@@ -97,5 +97,5 @@ class ServiceDriverTrip:
 
         self.repository.trip.update(trip, session=session)
 
-    def get_trip_path(self, orig: LatLon, dest: LatLon):
-        return self.repository.osm.generate_path(orig, dest)
+    def get_trip_path(self, orig: LatLon, dest: LatLon) -> List[LatLon]:
+        return self.repository.osm.generate_path(orig=orig, dest=dest)

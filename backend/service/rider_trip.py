@@ -201,7 +201,7 @@ class ServiceRiderTrip:
 
         self.repository.trip.update(trip, session=session)
 
-    def get_trip_path(self, orig: LatLon, dest: LatLon):
+    def get_trip_path(self, orig: LatLon, dest: LatLon) -> List[LatLon]:
         return self.repository.osm.generate_path(orig=orig, dest=dest)
 
     def find_poi(self, orig: LatLon, q: Optional[str] = None):
