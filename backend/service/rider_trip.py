@@ -210,3 +210,17 @@ class ServiceRiderTrip:
             q=q,
             limit=10 if q else 100,
         )
+
+    def create(self, rider_id: UUID, pickup: LatLon, dropoff: LatLon, request: Optional[str], fare: int,
+               passenger: int):
+        new_trip = Trip(
+            dropoff_lat=dropoff.lat,
+            dropoff_lon=dropoff.lon,
+            fare=fare,
+            passenger=passenger,
+            pickup_lat=pickup.lat,
+            pickup_lon=pickup.lon,
+            request=request,
+            rider_id=rider_id,
+        )
+        return self.repository.trip.insert_one()

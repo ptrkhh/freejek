@@ -143,3 +143,14 @@ class Controller:
                 session=session,
             )
         return res
+
+    def rider_trip_create(self,):
+        with Session(self.postgres) as session:
+            res = self.service.rider_trip.create_trip(
+                orig=req.orig,
+                dest=req.dest,
+                vehicle_class=req.vehicle_class,
+                vehicle_type=req.vehicle_type,
+                session=session,
+            )
+        return res

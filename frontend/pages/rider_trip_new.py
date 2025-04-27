@@ -43,11 +43,14 @@ def callback():
 
 
 fg = folium.FeatureGroup(name="Moving Marker")
-# TODO fg add child POI
-# TODO fg add child last click
-# TODO fg add child pickup
-# TODO fg add child dropoff (if not same as current location)
-# TODO fg add child get path (if dropoff not same as current location)
+for i in session_state.search_results:
+    fg.add_child(folium.CircleMarker(l.current_location.as_tuple()))
+fg.add_child(folium.CircleMarker(session_state.last_clicked.as_tuple()))
+fg.add_child(folium.CircleMarker(session_state.pickup.as_tuple()))
+if session_state.pickup != session_state.dropoff:
+    fg.add_child(folium.CircleMarker(session_state.dropoff.as_tuple()))
+    if session_state.path:
+        fg.add_child(folium.PolyLine([i.as_tuple() for i in session_state.path]))
 map_out = st_folium(
     folium.Map(location=[st.session_state["initial_lat"], st.session_state["initial_lon"]], zoom_start=16),
     feature_group_to_add=fg,
@@ -81,7 +84,7 @@ if session_state.fare:
 # Big order button
 if st.button("🚗 ORDER RIDE"):
     try:
-        # TODO call order ride
+        c.rider_get_latest_trip()
         st.success("Ride Ordered!")
         # TODO wait 2s
         # TODO redirect to current

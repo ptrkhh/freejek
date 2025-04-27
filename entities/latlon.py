@@ -18,6 +18,9 @@ class LatLon(BaseModel):
     def is_zero(self):
         return self.lat == 0.0 and self.lon == 0.0
 
+    def __eq__(self, other):
+        return (self.lat, self.lon) == (other.lat, other.lon)
+
 
 def latlon_distance(loc1: LatLon, loc2: LatLon) -> float:
     # Convert latitude and longitude from degrees to radians
@@ -26,7 +29,7 @@ def latlon_distance(loc1: LatLon, loc2: LatLon) -> float:
 
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return 6371000 * c # earth radius * radian dist
+    return 6371000 * c  # earth radius * radian dist
 
 
 def latlon_boundary_cluster(loc: LatLon, cluster_size_in_meters: int) -> Tuple[LatLon, LatLon]:
