@@ -9,7 +9,7 @@ from streamlit_folium import st_folium
 from backend.controller.router import Controller
 from entities.constant import VEHICLE_CLASS_INDEX
 from entities.latlon import LatLon
-from entities.web_trip import FareCalculatorReq
+from entities.web_trip import FareCalculatorReq, TripCreationReq
 from frontend.entities.session_state import RiderTripNew
 from frontend.utils.location_handler import LocationHandler
 from frontend.utils.token_handler import TokenHandler
@@ -78,16 +78,33 @@ passenger_count = st.slider("Passengers:", 1, 6, value=1, disabled=vehicle_type 
 
 notes = st.text_area("Notes for the driver:")
 
-if session_state.fare:
+req = session_state.fare_req
+updated_pickup = session_state.pickup != req.orig if req else True
+updated_dropoff = session_state.dropoff != req.dest if req else True
+updated_vehicle_class = vehicle_class != req.vehicle_class if req else True
+updated_vehicle_type = vehicle_type.lower() != req.vehicle_type.lower() if req else True
+fare_is_calculated_well = session_state.fare and (not (updated_pickup or updated_dropoff or updated_vehicle_class or updated_vehicle_type))
+if fare_is_calculated_well:
     st.markdown(f"### Estimated Fare: Rp{session_state.fare:,}")
+else:
+    st.markdown(f"### Estimated Fare: Calculating...")
 
 # Big order button
-if st.button("🚗 ORDER RIDE"):
+if st.button("🚗 ORDER RIDE", disabled=not fare_is_calculated_well):
     try:
-        c.rider_get_latest_trip()
+        c.rider_trip_create(req=TripCreationReq(
+            email=t.get_email(),
+            pickup=session_state.pickup,
+            dropoff=session_state.dropoff,
+            vehicle_class=session_state.vehicle_class,
+            vehicle_type="CAR" if vehicle_type.lower() == "car" else "MOTORCYCLE",
+            request=notes,
+            passenger=passenger_count,
+            fare=session_state.fare,
+        ))
         st.success("Ride Ordered!")
-        # TODO wait 2s
-        # TODO redirect to current
+        time.sleep(2)
+        st.switch_page("pages/rider_trip_current.py")
     except Exception as e:
         # TODO report with ID
         print(e)
@@ -96,11 +113,6 @@ if st.button("🚗 ORDER RIDE"):
 
 if count != st.session_state.last_count:  # TODO if failure = fine
     last_count = count
-    req = session_state.fare_req
-    updated_pickup = session_state.pickup != req.orig if req else True
-    updated_dropoff = session_state.dropoff != req.dest if req else True
-    updated_vehicle_class = vehicle_class != req.vehicle_class if req else True
-    updated_vehicle_type = vehicle_type.lower() != req.vehicle_type.lower() if req else True
     if updated_vehicle_type or updated_vehicle_class or updated_dropoff or updated_pickup:
         try:
             req = FareCalculatorReq(

@@ -31,11 +31,11 @@ class ServiceRiderTrip:
         # TODO surge pricing
         return int(base_price * vehicle_class_modifier * vehicle_type_modifier)
 
-    def request_trip(self, req: TripCreationReq, session: Session = None) -> UUID:
+    def create(self, req: TripCreationReq, session: Session = None) -> UUID:
         assert ((req.passenger < 2 and req.vehicle_type == "MOTORCYCLE") or
                 (req.passenger < 9 and req.vehicle_type == "CAR"))
 
-        rider = self.repository.rider.get_by_auth_id(req.auth_id, session=session)
+        rider = self.repository.rider.get_by_email(req.email, session=session)
         existing_trips = self.repository.trip.get_by_rider_id(rider.id, session=session)
         if len([i for i in existing_trips if is_trip_active(i)]) > 0:
             raise AssertionError("TRIP ONGOING")
@@ -58,6 +58,7 @@ class ServiceRiderTrip:
             pickup_lon=req.pickup.lon,
             request=req.request,
             rider_id=rider.id,
+            vehicle_class=req.vehicle_class,
         ), session=session)
 
         return new_trip.id
@@ -91,16 +92,16 @@ class ServiceRiderTrip:
             id=i.id,
             accepted_at=i.accepted_at,
             canceled_at=i.canceled_at,
-            comment_to_driver=i.comment_to_driver,
-            comment_to_rider=i.comment_to_rider,
+            comment_from_driver=i.comment_from_driver,
+            comment_from_rider=i.comment_from_rider,
             completed_at=i.completed_at,
             created_at=i.created_at,
             dropoff=LatLon(lat=i.dropoff_lat, lon=i.dropoff_lon),
             fare=i.fare,
             passenger=i.passenger,
             pickup=LatLon(lat=i.pickup_lat, lon=i.pickup_lon),
-            rate_to_driver=i.rate_to_driver,
-            rate_to_rider=i.rate_to_rider,
+            rate_from_driver=i.rate_from_driver,
+            rate_from_rider=i.rate_from_rider,
             request=i.request,
             started_at=i.started_at,
             updated_at=i.updated_at,
@@ -133,16 +134,16 @@ class ServiceRiderTrip:
             id=i.id,
             accepted_at=i.accepted_at,
             canceled_at=i.canceled_at,
-            comment_to_driver=i.comment_to_driver,
-            comment_to_rider=i.comment_to_rider,
+            comment_from_driver=i.comment_from_driver,
+            comment_from_rider=i.comment_from_rider,
             completed_at=i.completed_at,
             created_at=i.created_at,
             dropoff=LatLon(lat=i.dropoff_lat, lon=i.dropoff_lon),
             fare=i.fare,
             passenger=i.passenger,
             pickup=LatLon(lat=i.pickup_lat, lon=i.pickup_lon),
-            rate_to_driver=i.rate_to_driver,
-            rate_to_rider=i.rate_to_rider,
+            rate_from_driver=i.rate_from_driver,
+            rate_from_rider=i.rate_from_rider,
             request=i.request,
             started_at=i.started_at,
             updated_at=i.updated_at,
@@ -159,16 +160,16 @@ class ServiceRiderTrip:
             id=i.id,
             accepted_at=i.accepted_at,
             canceled_at=i.canceled_at,
-            comment_to_driver=i.comment_to_driver,
-            comment_to_rider=i.comment_to_rider,
+            comment_from_driver=i.comment_from_driver,
+            comment_from_rider=i.comment_from_rider,
             completed_at=i.completed_at,
             created_at=i.created_at,
             dropoff=LatLon(lat=i.dropoff_lat, lon=i.dropoff_lon),
             fare=i.fare,
             passenger=i.passenger,
             pickup=LatLon(lat=i.pickup_lat, lon=i.pickup_lon),
-            rate_to_driver=i.rate_to_driver,
-            rate_to_rider=i.rate_to_rider,
+            rate_from_driver=i.rate_from_driver,
+            rate_from_rider=i.rate_from_rider,
             request=i.request,
             started_at=i.started_at,
             updated_at=i.updated_at,
@@ -210,17 +211,3 @@ class ServiceRiderTrip:
             q=q,
             limit=10 if q else 100,
         )
-
-    def create(self, rider_id: UUID, pickup: LatLon, dropoff: LatLon, request: Optional[str], fare: int,
-               passenger: int):
-        new_trip = Trip(
-            dropoff_lat=dropoff.lat,
-            dropoff_lon=dropoff.lon,
-            fare=fare,
-            passenger=passenger,
-            pickup_lat=pickup.lat,
-            pickup_lon=pickup.lon,
-            request=request,
-            rider_id=rider_id,
-        )
-        return self.repository.trip.insert_one()

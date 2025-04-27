@@ -9,7 +9,7 @@ from entities.trip_status import TripStatus
 
 
 class TripCreationReq(BaseModel):
-    auth_id: UUID
+    email: str
     pickup: LatLon
     dropoff: LatLon
     vehicle_class: int
@@ -24,16 +24,16 @@ class GetTripsResp(BaseModel):
 
     accepted_at: datetime.datetime | None
     canceled_at: datetime.datetime | None
-    comment_to_driver: str | None
-    comment_to_rider: str | None
+    comment_from_driver: str | None
+    comment_from_rider: str | None
     completed_at: datetime.datetime | None
     created_at: datetime.datetime
     dropoff: LatLon
     fare: int
     passenger: int
     pickup: LatLon
-    rate_to_driver: int | None
-    rate_to_rider: int | None
+    rate_from_driver: int | None
+    rate_from_rider: int | None
     request: str | None
     started_at: datetime.datetime | None
     updated_at: datetime.datetime | None
@@ -52,16 +52,16 @@ class GetTripResp(BaseModel):
 
     accepted_at: datetime.datetime | None
     canceled_at: datetime.datetime | None
-    comment_to_driver: str | None
-    comment_to_rider: str | None
+    comment_from_driver: str | None
+    comment_from_rider: str | None
     completed_at: datetime.datetime | None
     created_at: datetime.datetime
     dropoff: LatLon
     fare: int
     passenger: int
     pickup: LatLon
-    rate_to_driver: int | None
-    rate_to_rider: int | None
+    rate_from_driver: int | None
+    rate_from_rider: int | None
     request: str | None
     started_at: datetime.datetime | None
     updated_at: datetime.datetime | None

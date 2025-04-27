@@ -28,16 +28,16 @@ class ServiceDriverTrip:
             id=i.id,
             accepted_at=i.accepted_at,
             canceled_at=i.canceled_at,
-            comment_to_driver=i.comment_to_driver,
-            comment_to_rider=i.comment_to_rider,
+            comment_from_driver=i.comment_from_driver,
+            comment_from_rider=i.comment_from_rider,
             completed_at=i.completed_at,
             created_at=i.created_at,
             dropoff=LatLon(lat=i.dropoff_lat, lon=i.dropoff_lon),
             fare=i.fare,
             passenger=i.passenger,
             pickup=LatLon(lat=i.pickup_lat, lon=i.pickup_lon),
-            rate_to_driver=i.rate_to_driver,
-            rate_to_rider=i.rate_to_rider,
+            rate_from_driver=i.rate_from_driver,
+            rate_from_rider=i.rate_from_rider,
             request=i.request,
             started_at=i.started_at,
             updated_at=i.updated_at,
@@ -91,7 +91,7 @@ class ServiceDriverTrip:
         else:
             logging.warn(f"TRIP {trip_id} RATING FROM DRIVER IS NONE")
         if comment:
-            trip.comment_to_driver = comment
+            trip.comment_from_driver = comment
         else:
             logging.warn(f"TRIP {trip_id} COMMENT FROM DRIVER IS NONE")
 

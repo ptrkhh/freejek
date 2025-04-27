@@ -12,7 +12,7 @@ from backend.repository import Repository
 from backend.service import Service
 from entities.latlon import LatLon
 from entities.web_master_data import WebVehicleModel
-from entities.web_trip import GetTripResp, GetDriverResp, FareCalculatorReq
+from entities.web_trip import GetTripResp, GetDriverResp, FareCalculatorReq, TripCreationReq
 
 
 class Controller:
@@ -144,13 +144,10 @@ class Controller:
             )
         return res
 
-    def rider_trip_create(self,):
+    def rider_trip_create(self, req: TripCreationReq):
         with Session(self.postgres) as session:
-            res = self.service.rider_trip.create_trip(
-                orig=req.orig,
-                dest=req.dest,
-                vehicle_class=req.vehicle_class,
-                vehicle_type=req.vehicle_type,
+            res = self.service.rider_trip.create(
+                req=req,
                 session=session,
             )
         return res

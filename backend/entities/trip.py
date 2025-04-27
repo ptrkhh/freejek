@@ -43,3 +43,6 @@ class Trip(SQLModel, table=True):
     driver_id: uuid.UUID | None = Field(default=None, foreign_key="driver.id")
     rider_id: uuid.UUID = Field(foreign_key="rider.id")
     vehicle_id: uuid.UUID | None = Field(default=None, foreign_key="vehicle_unit.id")
+
+    vehicle_class: int
+
