@@ -32,7 +32,10 @@ count = st_autorefresh(interval=os.environ.get("PING_DELAY_IDLE", 15) * 1000)
 
 if count != st.session_state.last_count:
     last_count = count
-    l.update()
+    try:
+        l.update()
+    except AssertionError:
+        pass
     fg.add_child(folium.CircleMarker(l.current_location.as_list()))
 
 # TODO sidebar

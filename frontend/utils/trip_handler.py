@@ -1,6 +1,8 @@
 from typing import Union, List
 from uuid import UUID
 
+from jwt import ExpiredSignatureError, DecodeError
+
 from backend.controller.router import Controller
 from entities.latlon import LatLon
 from entities.web_trip import GetTripResp, GetDriverResp
@@ -11,7 +13,12 @@ class TripHandler:
     def __init__(self, c: Controller, t: TokenHandler):
         self.c = c
         self.t = t
-        self.last_trip: Union[GetTripResp, None] = self.update()
+        try:
+            self.last_trip: Union[GetTripResp, None] = self.update()
+        except ExpiredSignatureError as e:
+            self.last_trip = None
+        except DecodeError as e:
+            self.last_trip = None
         self.route_path: List[LatLon] = []
 
     def update(self) -> Union[GetTripResp, None]:

@@ -21,6 +21,10 @@ class TokenHandler:
         try:
             self.validate_token(self.get_token(), self.get_refresh_token())
             return True
+        except FileNotFoundError:
+            return False
+        except ExpiredSignatureError:
+            return False
         except Exception as e:
             print("ERROR WHEN RETRIEVING TOKEN", e)
             traceback.print_exc()
@@ -36,8 +40,15 @@ class TokenHandler:
             jwt.decode(access_token, self.secret_key, audience="authenticated", algorithms=[self.algorithm])
         except ExpiredSignatureError:  # refresh
             payload = self._decode(access_token, options={'verify_exp': False})
-            access_token, refresh_token = self.c.rider_refresh_token(refresh_token)
-            self.store_token(access_token, refresh_token, payload.get("driver_or_rider"))
+            try:
+                access_token, refresh_token = self.c.rider_refresh_token(refresh_token)
+                self.store_token(access_token, refresh_token, payload.get("driver_or_rider"))
+            except ExpiredSignatureError:  # refresh
+                self.clear_token()
+            except Exception as e:
+                self.clear_token()
+                print("ERROR WHEN REFRESHING TOKEN", e)
+                traceback.print_exc()
 
     def get_token(self):
         return self.ls.getItem(ACCESS_TOKEN)
@@ -89,5 +100,5 @@ class TokenHandler:
         )
 
     def clear_token(self):
-        self.ls.setItem(ACCESS_TOKEN, None)
-        self.ls.setItem(REFRESH_TOKEN, None)
+        self.ls.deleteItem(ACCESS_TOKEN, key=ACCESS_TOKEN)
+        self.ls.deleteItem(REFRESH_TOKEN, key=REFRESH_TOKEN)

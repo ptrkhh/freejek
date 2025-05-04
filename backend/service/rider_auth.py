@@ -1,6 +1,8 @@
 import logging
 from typing import Literal
 
+from gotrue.errors import AuthApiError
+from jwt import ExpiredSignatureError
 from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session
 

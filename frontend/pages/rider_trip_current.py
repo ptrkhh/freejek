@@ -9,14 +9,15 @@ from backend.controller.router import Controller
 from entities.latlon import LatLon
 from entities.trip_status import TripStatus
 from frontend.entities.session_state import RiderTripCurrent
+from frontend.utils.init import init
 from frontend.utils.location_handler import LocationHandler
 from frontend.utils.token_handler import TokenHandler
 from frontend.utils.trip_handler import TripHandler
 
-c: Controller = st.session_state.controller
-t: TokenHandler = st.session_state.token_handler
-l: LocationHandler = st.session_state.location_handler
-tr: TripHandler = st.session_state.trip_handler
+c, t, l, tr = init()
+
+if not tr.last_trip:
+    st.switch_page("main.py")
 
 if 'rider_trip_current' not in st.session_state:
     st.session_state["rider_trip_current"] = RiderTripCurrent.zero_value()
